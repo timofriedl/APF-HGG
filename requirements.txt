@@ -6,6 +6,7 @@ certifi==2023.11.17
 cffi==1.15.1
 charset-normalizer==3.3.2
 cloudpickle==2.2.1
+cmake==3.27.9
 cycler==0.11.0
 Cython==0.29.37
 Farama-Notifications==0.0.4

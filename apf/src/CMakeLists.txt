@@ -7,8 +7,10 @@ set(SRC_FILES
         controller/Controller.cpp
         transform/jacobian.cpp
         apf/apf.cpp
-        gateway.h
+        gateway.cpp
 )
+
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O1")
 
 # Define the library target
 add_library(apf_hgg_core SHARED ${SRC_FILES})
