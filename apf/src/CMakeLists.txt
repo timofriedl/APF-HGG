@@ -10,7 +10,7 @@ set(SRC_FILES
         gateway.cpp
 )
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O1")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -march=native")
 
 # Define the library target
 add_library(apf_hgg_core SHARED ${SRC_FILES})

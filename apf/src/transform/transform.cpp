@@ -73,30 +73,30 @@ inline transform::TMatrix transform_flange() {
     return t;
 }
 
-inline transform::TMatrix createTransformMatrix(size_t i, double ci, double si) {
-    switch (i) {
-        case 0:
-            return transform0_1(ci, si);
-        case 1:
-            return transform1_2(ci, si);
-        case 2:
-            return transform2_3(ci, si);
-        case 3:
-            return transform3_4(ci, si);
-        case 4:
-            return transform4_5(ci, si);
-        case 5:
-            return transform5_6(ci, si);
-        case 6:
-            return transform6_7(ci, si);
-        case 7:
-            return transform_flange();
-        default:
-            assert(false);
-    }
-}
-
 namespace transform {
+    TMatrix createTransformMatrix(size_t i, double ci, double si) {
+        switch (i) {
+            case 0:
+                return transform0_1(ci, si);
+            case 1:
+                return transform1_2(ci, si);
+            case 2:
+                return transform2_3(ci, si);
+            case 3:
+                return transform3_4(ci, si);
+            case 4:
+                return transform4_5(ci, si);
+            case 5:
+                return transform5_6(ci, si);
+            case 6:
+                return transform6_7(ci, si);
+            case 7:
+                return transform_flange();
+            default:
+                assert(false);
+        }
+    }
+
     std::pair<TMatrices, TMatrices> createTransformMatrices(const Eigen::Vector<double, JOINT_COUNT> &theta) {
         assert(JOINT_COUNT == 7);
 

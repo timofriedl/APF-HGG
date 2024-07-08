@@ -25,3 +25,5 @@ __pycache__/*
 /mppi_logs/
 /mppi_tuning_results/
 /apf/build/
+/apf/cmake-build-debug/
+/apf/cmake-build-release/
