@@ -24,3 +24,4 @@ __pycache__/*
 /mpc/FORCESNLPsolver2_max/
 /mppi_logs/
 /mppi_tuning_results/
+/apf/build/
