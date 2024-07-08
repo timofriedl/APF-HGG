@@ -1,0 +1,14 @@
+_frankx.cpython-38-x86_64-linux-gnu.so,sha256=MBql5DZy0nga2KQXHth2B3MNQQJtpEhtSRzckdKSfig,1041928
+pyaffx.cpython-38-x86_64-linux-gnu.so,sha256=U0REZIVJujiYKqkX3lwZh2bJwEmJ5lQ2x1AAOCq6Bqk,262216
+frankx.libs/libfranka-9c00d6c5.so.0.9.0,sha256=MLekwZmXYjBqbqZCSp9xOVcxH4labZfA-ri4Re2DNYc,6460376
+frankx.libs/libPocoNet-ac8eb170.so.31,sha256=qC9VRWKLeFF0nE_jhalRbMGQtvRWHbh2EOVYF29iR8U,1615408
+frankx.libs/libpcre-9513aab5.so.1.2.0,sha256=r9Y0L2DyrIDPw-5TsPJRcdYcb55MKF6Wf3Ar9eI7gbI,406816
+frankx.libs/libPocoFoundation-c26869a6.so.31,sha256=Wo1Ujh8Yts0zSYalfly7QS7NO1GV8Q50y6ELmN2sHs0,2252344
+frankx/gripper.py,sha256=T45YoGEopQKGq8MtvAMOD4KwwuK8rICMUOyUO7v2uL4,400
+frankx/__init__.py,sha256=e2-Mg8QDh-XlEJFg2MNvsmWrHS7j3qCulEuHJSDDDNU,428
+frankx/robot.py,sha256=CeKkQs6LxsXpNLH3Cnx2rIoat1VyfA93POgx6dt_fKc,2616
+frankx-0.2.0.dist-info/WHEEL,sha256=-ijGDuALlPxm3HbhKntps0QzHsi-DPlXqgerYTTJkFE,148
+frankx-0.2.0.dist-info/top_level.txt,sha256=YfIpekaSAvoYS67jfsBMhAtl1Lf4CHZJnmYlnJHHumA,22
+frankx-0.2.0.dist-info/METADATA,sha256=BYP2n6vEmI-TxGNcRGDiofuWbi5aR2emHDucE0LBJAs,12952
+frankx-0.2.0.dist-info/RECORD,,
+frankx-0.2.0.dist-info/LICENSE,sha256=6or154nLLU6bELzjh0mCreFjt0m2v72zLi3yHE0QbeE,7650
