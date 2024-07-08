@@ -27,3 +27,4 @@ __pycache__/*
 /apf/build/
 /apf/cmake-build-debug/
 /apf/cmake-build-release/
+/videos/*
