@@ -13,4 +13,5 @@ def make_policy(args):
         'MPCRLPolicy': MPCRLPolicy,
         'MPCPolicy': MPCPolicy,
         'RLPolicy': RLPolicy,
+        'APFPolicy': APFPolicy
     }[args.play_policy](args)

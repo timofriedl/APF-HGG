@@ -67,8 +67,8 @@ def get_args():
 
     parser.add_argument('--save_acc', help='save successful rate', type=str2bool, default=True)
 
-    parser.add_argument('--play_policy', help='Policy to choose an action', type=str, default='MPCRLPolicy',
-                        choices=['MPPIRLPolicy', 'MPPIPolicy', 'MPCRLPolicy', 'MPCPolicy', 'RLPolicy'])
+    parser.add_argument('--play_policy', help='Policy to choose an action', type=str, default='APFPolicy',
+                        choices=['MPPIRLPolicy', 'MPPIPolicy', 'MPCRLPolicy', 'MPCPolicy', 'RLPolicy', 'APFPolicy'])
     parser.add_argument('--mpc_gen', help='Generate MPC', type=str2bool, default=False)
     parser.add_argument('--mpc_path', help='MPC solver path', type=str, default='mpc/')
     parser.add_argument('--env_n_substeps', help='Steps to simulate', type=np.int32, default=20)
