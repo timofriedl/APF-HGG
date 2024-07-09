@@ -4,6 +4,7 @@ from .mpc_policy import MPCPolicy
 from .mpc_rl_policy import MPCRLPolicy
 from .mppi_policy import MPPIPolicy
 from .mppi_rl_policy import MPPIRLPolicy
+from .apf_policy import APFPolicy
 
 
 def make_policy(args):

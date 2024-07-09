@@ -8,10 +8,6 @@
 #include "../constants.h"
 
 class Controller {
-    static constexpr double K_p = 100.0;
-    static constexpr double K_i = 0;
-    static constexpr double K_d = 0;
-
     const Eigen::Vector<double, JOINT_COUNT> &theta;
     const double currentGripper;
     const Eigen::Vector3d &targetPos;
