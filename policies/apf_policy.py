@@ -47,6 +47,7 @@ class APFPolicy(Policy):
         forces = control_step(q, desired_goal, 1.0, obstacle_attributes)  # TODO set target_gripper
 
         # TODO directly apply forces instead of returning [dx, dy, dz, q1, q2, q3, q4]
+        # TODO currently is action the demanded positional offset
 
         action[0:7] = np.zeros(7, dtype=np.float32)
         action[7] = rl_action[7]
