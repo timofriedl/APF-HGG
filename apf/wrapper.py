@@ -29,8 +29,9 @@ prev_time = -1
 def control_step(theta: np.ndarray, target_pos_values: np.ndarray, obstacle_attributes: np.ndarray):
     assert theta.shape[0] == JOINT_COUNT
     assert target_pos_values.shape[0] == 3
-    assert obstacle_attributes.ndim == 2
-    assert obstacle_attributes.shape[1] == 7
+    if len(obstacle_attributes) > 0:
+        assert obstacle_attributes.ndim == 2
+        assert obstacle_attributes.shape[1] == 7
 
     global prev_time
     now = time.time()

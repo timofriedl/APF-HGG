@@ -34,20 +34,17 @@ class APFPolicy(Policy):
     def predict(self, obs: Vector) -> (Vector, InfoVector):
         action = np.zeros(8)
         [rl_action], _ = self.rl_policy.predict(obs)
-        desired_goal = np.array([0.5, 0, 0.3], dtype=np.float32)  # TODO tf obs[0]["desired_goal"]
+        rl_goal_pos = rl_action[:3]
+        rl_goal_rot = rl_action[3:7]
         ob = obs[0]["observation"]
-
         theta = ob[7:14]
 
         obstacle_attributes = np.array([], dtype=np.float64)  # TODO add obstacles
-        forces = control_step(theta, desired_goal, obstacle_attributes)
 
-        np.set_printoptions(precision=1)
-        print(forces)
-
+        forces = control_step(theta, rl_goal_pos, obstacle_attributes)
         max_forces = self.envs[0].sim.model.actuator_forcerange[:7, 1]
+        action[:7] = forces / max_forces  # Normalize forces to [-1, 1]
 
-        action[:7] = forces[:7] / max_forces  # Normalize forces to [-1, 1]
         action[7] = rl_action[7]  # Directly use RL gripper action
 
         return [action], _

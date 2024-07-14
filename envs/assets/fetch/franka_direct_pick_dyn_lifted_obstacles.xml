@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- "direct" refers to direct torque control (instead of mocap control)
-- changed "franka_shared.xml" to "franka_direct_shared.xml" TODO tf do for all envs -->
+- changed "franka_shared.xml" to "franka_direct_shared.xml" -->
 <mujoco>
     <compiler angle="radian" coordinate="local" meshdir="" texturedir="../textures"></compiler>
     <option timestep="0.002">

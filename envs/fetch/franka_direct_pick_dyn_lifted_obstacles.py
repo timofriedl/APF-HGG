@@ -321,8 +321,8 @@ class FrankaDirectFetchPickDynLiftedObstaclesEnv(robot_env.RobotEnv, gym.utils.E
         n_dyn = self.n_moving_obstacles
         directions = self.np_random.choice([-1, 1], size=n_dyn)
 
-        # directions[0] = -1  # TODO Just for reproduction purpose
-        # directions[1] = 1  # TODO Just for reproduction purpose
+        # directions[0] = -1  # Just for reproduction purpose
+        # directions[1] = 1  # Just for reproduction purpose
 
         self.current_obstacle_shifts = self.np_random.uniform(-1.0, 1.0, size=n_obst)
         self.current_obstacle_vels[0] = directions[0] * self.np_random.uniform(self.vel_lims[0], self.vel_lims[1],
@@ -330,11 +330,11 @@ class FrankaDirectFetchPickDynLiftedObstaclesEnv(robot_env.RobotEnv, gym.utils.E
         # lower velocity for rectangle obstacle
         self.current_obstacle_vels[1] = directions[1] * self.np_random.uniform(self.vel_lims2[0], self.vel_lims2[1],
                                                                                size=1)
-        # self.current_obstacle_shifts[0] = 0.38997551  # TODO Just for reproduction purpose
-        # self.current_obstacle_shifts[1] = 0.54387205  # TODO Just for reproduction purpose
-        # self.current_obstacle_shifts[2] = 0.48796797  # TODO Just for reproduction purpose
-        # self.current_obstacle_vels[0] = -0.64831615  # TODO Just for reproduction purpose
-        # self.current_obstacle_vels[1] = 0.4220434  # TODO Just for reproduction purpose
+        # self.current_obstacle_shifts[0] = 0.38997551  # Just for reproduction purpose
+        # self.current_obstacle_shifts[1] = 0.54387205  # Just for reproduction purpose
+        # self.current_obstacle_shifts[2] = 0.48796797  # Just for reproduction purpose
+        # self.current_obstacle_vels[0] = -0.64831615  # Just for reproduction purpose
+        # self.current_obstacle_vels[1] = 0.4220434  # Just for reproduction purpose
 
         # print("Directions")
         # print(directions)
@@ -352,8 +352,8 @@ class FrankaDirectFetchPickDynLiftedObstaclesEnv(robot_env.RobotEnv, gym.utils.E
 
         goal[1] += self.np_random.uniform(-self.target_range_y, self.target_range_y)
         goal[0] += self.np_random.uniform(-self.target_range_x, self.target_range_x)
-        # goal[0] = 1.20032209  # TODO Just for reproduction purpose
-        # goal[1] = 0.48116506  # TODO Just for reproduction purpose
+        # goal[0] = 1.20032209  # Just for reproduction purpose
+        # goal[1] = 0.48116506  # Just for reproduction purpose
         # print("Goal:")
         # print(goal)
         return goal.copy()
@@ -374,16 +374,12 @@ class FrankaDirectFetchPickDynLiftedObstaclesEnv(robot_env.RobotEnv, gym.utils.E
         sites_offset = (self.sim.data.site_xpos - self.sim.model.site_pos).copy()[6]
 
         # Move end effector into position.
-        gripper_target = self.init_center + self.gripper_extra_height  # + self.sim.data.get_site_xpos('robot0:grip')
-        gripper_rotation = np.array([0, 1., 0., 0.])
-        # TODO tf self.sim.data.set_mocap_pos('panda0:mocap', gripper_target)
-        # TODO tf self.sim.data.set_mocap_quat('panda0:mocap', gripper_rotation)
+        theta = [-1.5531603498364208, -1.1783930647650682, 1.993011792106189, -2.045070748792923, 1.3757972477995606,
+                 2.107712606001714, 0.4674864089863272]
+        for i, angle in enumerate(theta):
+            self.sim.data.set_joint_qpos("robot0_joint{}".format(i + 1), angle)
 
-        pre_sub_steps = 200
-        pre_steps = int(pre_sub_steps / self.sim.nsubsteps)
-
-        for _ in range(pre_steps):
-            self.sim.step()
+        self.sim.step()
 
         # Extract information for sampling goals.
         self.initial_gripper_xpos = self.sim.data.get_site_xpos('grip_site').copy()
