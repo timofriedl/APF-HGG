@@ -5,7 +5,6 @@
 
 // Robot
 constexpr size_t JOINT_COUNT = 7;
-constexpr size_t ACT_COUNT = 8;
 
 // Jacobian
 constexpr double DERIVATIVE_EPSILON = 1E-5;

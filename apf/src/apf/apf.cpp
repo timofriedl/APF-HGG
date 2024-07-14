@@ -5,7 +5,7 @@ std::vector<std::pair<size_t, Capsule>> apf::robotCapsules(const transform::TMat
     std::vector<std::tuple<size_t, Eigen::Vector4d, Eigen::Vector4d, double>> coordinates = {
             {3, {0,    0,     -0.055, 1}, {0,    0,      0.055, 1}, 0.075}, // Elbow (4. Frame)
             {4, {0,    0,     -0.23,  1}, {0,    0,      -0.32, 1}, 0.07}, // Forearm 1 (5. Frame)
-            // {4, {0, 0.07, -0.18, 1}, 5, {0, 0, -0.1, 1}, 0.045}, // Forearm 2 (5. & 6. Frame) TODO model this using only one link and not two
+            // {4, {0, 0.07, -0.18, 1}, 5, {0, 0, -0.1, 1}, 0.045}, // Forearm 2 (5. & 6. Frame) TODO tf model this using only one link and not two
             {5, {0,    0,     -0.08,  1}, {0,    0,      0.01,  1}, 0.067}, // Wrist (6. Frame)
             {6, {0,    0,     -0.04,  1}, {0,    0,      0.175, 1}, 0.065}, // Hand 1 (7. Frame)
             {6, {0,    0.061, 0.13,   1}, {0,    -0.061, 0.13,  1}, 0.065}, // Hand 2 (7. Frame)
@@ -14,15 +14,15 @@ std::vector<std::pair<size_t, Capsule>> apf::robotCapsules(const transform::TMat
 
     std::vector<std::pair<size_t, Capsule>> robotCapsules;
     robotCapsules.reserve(coordinates.size());
-    for (auto &[i, p1, p2, r]: coordinates) {
-        assert(i < JOINT_COUNT);
-        assert(p1[3] == 1);
-        assert(p2[3] == 1);
-        assert(r > 0);
-        Eigen::Vector3d from = (tProducts[i] * p1).head<3>();
-        Eigen::Vector3d to = (tProducts[i] * p2).head<3>();
+    for (auto &[linkId, fromPoint, toPoint, radius]: coordinates) {
+        assert(linkId < JOINT_COUNT);
+        assert(fromPoint[3] == 1);
+        assert(toPoint[3] == 1);
+        assert(radius > 0);
+        Eigen::Vector3d from = (tProducts[linkId] * fromPoint).head<3>();
+        Eigen::Vector3d to = (tProducts[linkId] * toPoint).head<3>();
         Line line = {std::move(from), std::move(to)};
-        robotCapsules.push_back({i, {std::move(line), r}});
+        robotCapsules.push_back({linkId, {std::move(line), radius}});
     }
 
     return robotCapsules;
@@ -77,7 +77,7 @@ apf::computeTorques(const transform::TMatrices &tProducts, const transform::TMat
             torques += apf::computeTorque(linkCapsule, obstacle, tProductsInv[i], vJacobians[i], oJacobians[i]);
         }
 
-        // TODO self-collision
+        // TODO tf self-collision
     }
 
     return torques;

@@ -3,7 +3,7 @@
 #include "gateway.h"
 
 int main() {
-    std::array<double, ACT_COUNT> q = {0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.5};
+    std::array<double, JOINT_COUNT> theta = {0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7};
     std::array<double, 3> targetPos = {1, 2, 3};
     double targetGripper = 1.0;
     std::vector<double> obstacleAttributes = {
@@ -16,13 +16,13 @@ int main() {
     };
     double dt = 0.001;
 
-    std::array<double, ACT_COUNT> integralValues{};
-    std::array<double, ACT_COUNT> prevErrorValues{};
-    std::array<double, ACT_COUNT> forceResult{};
+    std::array<double, JOINT_COUNT> integralValues{};
+    std::array<double, JOINT_COUNT> prevErrorValues{};
+    std::array<double, JOINT_COUNT> forceResult{};
 
     auto start = std::chrono::high_resolution_clock::now();
 
-    step(q.data(), targetPos.data(), targetGripper, obstacleAttributes.data(), obstacleAttributes.size() / 7,
+    step(theta.data(), targetPos.data(), targetGripper, obstacleAttributes.data(), obstacleAttributes.size() / 7,
          dt, integralValues.data(), prevErrorValues.data(), forceResult.data());
 
     auto end = std::chrono::high_resolution_clock::now();

@@ -11,17 +11,16 @@ Capsule parseCapsule(const double *capsuleAttributes) {
 }
 
 extern "C" {
-void step(const double q[ACT_COUNT], const double targetPosValues[3], double targetGripper,
+void step(const double jointAngles[JOINT_COUNT], const double targetPosValues[3], double targetGripper,
           const double *obstacleAttributes, size_t obstacleCount, double dt,
-          double integralValues[ACT_COUNT], double prevErrorValues[ACT_COUNT],
-          double forceResult[ACT_COUNT]) {
+          double integralValues[JOINT_COUNT], double prevErrorValues[JOINT_COUNT],
+          double forceResult[JOINT_COUNT]) {
 
     // Extract objects
-    const Eigen::Vector<double, JOINT_COUNT> theta(q);
-    double currentGripper = q[JOINT_COUNT];
+    const Eigen::Vector<double, JOINT_COUNT> theta(jointAngles);
     const Eigen::Vector3d targetPos(targetPosValues);
-    Eigen::Vector<double, ACT_COUNT> integral(integralValues);
-    Eigen::Vector<double, ACT_COUNT> prevError(prevErrorValues);
+    Eigen::Vector<double, JOINT_COUNT> integral(integralValues);
+    Eigen::Vector<double, JOINT_COUNT> prevError(prevErrorValues);
 
     // Build obstacles
     std::vector<Capsule> obstacles;
@@ -31,13 +30,13 @@ void step(const double q[ACT_COUNT], const double targetPosValues[3], double tar
         obstacles.push_back(std::move(parseCapsule(obstacleAttributes + i * numPerCapsule)));
 
     // Create controller
-    Controller controller(theta, currentGripper, targetPos, targetGripper, obstacles, integral, prevError, dt);
+    Controller controller(theta, targetPos, obstacles, integral, prevError, dt);
 
     // Compute
-    Eigen::Map<Eigen::Vector<double, ACT_COUNT>>(forceResult).noalias() = controller.update();
+    Eigen::Map<Eigen::Vector<double, JOINT_COUNT>>(forceResult).noalias() = controller.update();
 
     // Update integral and prevError values
-    std::copy(integral.data(), integral.data() + ACT_COUNT, integralValues);
-    std::copy(prevError.data(), prevError.data() + ACT_COUNT, prevErrorValues);
+    std::copy(integral.data(), integral.data() + JOINT_COUNT, integralValues);
+    std::copy(prevError.data(), prevError.data() + JOINT_COUNT, prevErrorValues);
 }
 }

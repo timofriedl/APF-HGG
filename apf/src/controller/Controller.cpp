@@ -3,11 +3,11 @@
 #include "../transform/jacobian.h"
 #include "../apf/apf.h"
 
-Eigen::Vector<double, ACT_COUNT> limitAbs(const Eigen::Vector<double, ACT_COUNT> &v, double maxAbsValue) {
+Eigen::Vector<double, JOINT_COUNT> limitAbs(const Eigen::Vector<double, JOINT_COUNT> &v, double maxAbsValue) {
     return v.cwiseMin(maxAbsValue).cwiseMax(-maxAbsValue);
 }
 
-Eigen::Vector<double, ACT_COUNT> Controller::update() {
+Eigen::Vector<double, JOINT_COUNT> Controller::update() {
     // Compute transform matrices
     auto [tMatrices, tProducts] = transform::createTransformMatrices(theta);
     assert(tMatrices.size() == JOINT_COUNT + 1);
@@ -25,21 +25,15 @@ Eigen::Vector<double, ACT_COUNT> Controller::update() {
     jacobian::Jacobians oJacobians = jacobian::orientationJacobians(tProducts);
 
     jacobian::Jacobian eefJacobian = vJacobians[JOINT_COUNT - 1];
-    Eigen::Vector<double, JOINT_COUNT> jointError = eefJacobian.transpose() * taskError;
-
-    double gripperError = targetGripper - currentGripper;
-
-    Eigen::Vector<double, ACT_COUNT> error(ACT_COUNT);
-    error.head(JOINT_COUNT) = jointError;
-    error.tail(1) << gripperError;
+    Eigen::Vector<double, JOINT_COUNT> error = eefJacobian.transpose() * taskError;
 
     // Compute PID values
-    Eigen::Vector<double, ACT_COUNT> p = error * K_p;
-    Eigen::Vector<double, ACT_COUNT> i = (integral += error * dt) * K_i;
-    Eigen::Vector<double, ACT_COUNT> d = (error - prevError) * (K_d / dt);
+    Eigen::Vector<double, JOINT_COUNT> p = error * K_p;
+    Eigen::Vector<double, JOINT_COUNT> i = (integral += error * dt) * K_i;
+    Eigen::Vector<double, JOINT_COUNT> d = (error - prevError) * (K_d / dt);
     prevError = error;
 
-    Eigen::Vector<double, ACT_COUNT> forces = limitAbs(p + i + d, PID_MAX_FORCE);
+    Eigen::Vector<double, JOINT_COUNT> forces = limitAbs(p + i + d, PID_MAX_FORCE);
 
     // Compute APF torques
     auto apfTorques = apf::computeTorques(tProducts, tProductsInv, vJacobians, oJacobians, obstacles);
