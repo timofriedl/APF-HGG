@@ -34,7 +34,7 @@ class APFPolicy(Policy):
     def predict(self, obs: Vector) -> (Vector, InfoVector):
         action = np.zeros(8)
         [rl_action], _ = self.rl_policy.predict(obs)
-        desired_goal = obs[0]["desired_goal"]
+        desired_goal = np.array([0.5, 0, 0.3], dtype=np.float32)  # TODO tf obs[0]["desired_goal"]
         ob = obs[0]["observation"]
 
         theta = ob[7:14]
@@ -42,8 +42,9 @@ class APFPolicy(Policy):
         obstacle_attributes = np.array([], dtype=np.float64)  # TODO add obstacles
         forces = control_step(theta, desired_goal, obstacle_attributes)
 
-        np.set_printoptions(precision=3)
+        np.set_printoptions(precision=1)
         print(forces)
+        assert not np.any(np.isnan(forces))
 
         max_forces = self.envs[0].sim.model.actuator_forcerange[:7, 1]
 

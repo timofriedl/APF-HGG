@@ -36,7 +36,7 @@ def control_step(theta: np.ndarray, target_pos_values: np.ndarray, obstacle_attr
     theta64[:] = theta
     target_pos_values64[:] = target_pos_values[:]
 
-    force_result = np.zeros(8, dtype=np.float64)
+    force_result = np.zeros(7, dtype=np.float64)
     lib.step(theta64, target_pos_values64, obstacle_attributes.flatten(), len(obstacle_attributes), dt,
              integral_values, prev_error_values, force_result)
 
