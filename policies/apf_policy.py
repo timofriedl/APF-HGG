@@ -37,11 +37,10 @@ class APFPolicy(Policy):
         desired_goal = obs[0]["desired_goal"]
         ob = obs[0]["observation"]
 
-        q = np.zeros(8)
-        q[:7] = ob[7:14]
+        theta = ob[7:14]
 
         obstacle_attributes = np.array([], dtype=np.float64)  # TODO add obstacles
-        forces = control_step(q, desired_goal, 1.0, obstacle_attributes)
+        forces = control_step(theta, desired_goal, 1.0, obstacle_attributes)
 
         max_forces = self.envs[0].sim.model.actuator_forcerange[:7, 1]
 
