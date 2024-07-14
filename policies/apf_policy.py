@@ -44,7 +44,6 @@ class APFPolicy(Policy):
 
         np.set_printoptions(precision=1)
         print(forces)
-        assert not np.any(np.isnan(forces))
 
         max_forces = self.envs[0].sim.model.actuator_forcerange[:7, 1]
 

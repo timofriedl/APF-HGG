@@ -19,6 +19,6 @@ constexpr double PID_MAX_FORCE = 1.0E9;
 // APF
 constexpr double APF_FORCE_FACTOR = 0.0;
 constexpr double APF_MAX_FORCE = 1.0E9;
-constexpr double CUTOFF_RADIUS = 0.50;
+constexpr double CUTOFF_RADIUS = 0.25;
 
 #endif //APF_HGG_CORE_CONSTANTS_H

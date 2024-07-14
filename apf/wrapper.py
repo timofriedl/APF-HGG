@@ -3,6 +3,8 @@ import ctypes
 import numpy as np
 import time
 
+JOINT_COUNT = 7
+
 lib = ctypes.CDLL('./apf/build/src/libapf_hgg_core.so')
 
 lib.step.argtypes = [
@@ -16,17 +18,19 @@ lib.step.argtypes = [
     np.ctypeslib.ndpointer(dtype=np.float64, ndim=1)  # double forceResult[ACT_COUNT]
 ]
 
-theta64 = np.zeros(7, dtype=np.float64)
+theta64 = np.zeros(JOINT_COUNT, dtype=np.float64)
 target_pos_values64 = np.zeros(3, dtype=np.float64)
 
-integral_values = np.zeros(8, dtype=np.float64)
-prev_error_values = np.zeros(8, dtype=np.float64)
+integral_values = np.zeros(JOINT_COUNT, dtype=np.float64)
+prev_error_values = np.zeros(JOINT_COUNT, dtype=np.float64)
 prev_time = -1
 
 
 def control_step(theta: np.ndarray, target_pos_values: np.ndarray, obstacle_attributes: np.ndarray):
-    assert theta.shape[0] == 7
+    assert theta.shape[0] == JOINT_COUNT
     assert target_pos_values.shape[0] == 3
+    assert obstacle_attributes.ndim == 2
+    assert obstacle_attributes.shape[1] == 7
 
     global prev_time
     now = time.time()
@@ -36,8 +40,8 @@ def control_step(theta: np.ndarray, target_pos_values: np.ndarray, obstacle_attr
     theta64[:] = theta
     target_pos_values64[:] = target_pos_values[:]
 
-    force_result = np.zeros(7, dtype=np.float64)
-    lib.step(theta64, target_pos_values64, obstacle_attributes.flatten(), len(obstacle_attributes), dt,
+    force_result = np.zeros(JOINT_COUNT, dtype=np.float64)
+    lib.step(theta64, target_pos_values64, obstacle_attributes.flatten(), obstacle_attributes.shape[0], dt,
              integral_values, prev_error_values, force_result)
 
     return force_result
@@ -46,15 +50,16 @@ def control_step(theta: np.ndarray, target_pos_values: np.ndarray, obstacle_attr
 if __name__ == '__main__':
     print("Trying the APF-HGG C++ library...")
 
-    theta_values = np.zeros(7, dtype=np.float32)
+    np.random.seed = 42
+    theta_values = np.random.rand(JOINT_COUNT)
     target_pos = np.zeros(3, dtype=np.float32)
 
     attr = [
-        [0, 1, 2, 3, 4, 5],
-        [1, 2, 3, 4, 5, 6],
-        [2, 3, 4, 5, 6, 7],
-        [3, 4, 5, 6, 7, 8],
-        [4, 5, 6, 7, 8, 9]
+        [0, 1, 2, 3, 4, 5, 6],
+        [1, 2, 3, 4, 5, 6, 7],
+        [2, 3, 4, 5, 6, 7, 8],
+        [3, 4, 5, 6, 7, 8, 9],
+        [4, 5, 6, 7, 8, 9, 0]
     ]
     obs_attr = np.array(attr, dtype=np.float64)
 

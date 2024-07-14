@@ -11,7 +11,7 @@ Capsule parseCapsule(const double *capsuleAttributes) {
 }
 
 extern "C" {
-void step(const double jointAngles[JOINT_COUNT], const double targetPosValues[3], double targetGripper,
+void step(const double jointAngles[JOINT_COUNT], const double targetPosValues[3],
           const double *obstacleAttributes, size_t obstacleCount, double dt,
           double integralValues[JOINT_COUNT], double prevErrorValues[JOINT_COUNT],
           double forceResult[JOINT_COUNT]) {

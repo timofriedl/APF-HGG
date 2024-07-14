@@ -17,8 +17,7 @@ Eigen::Vector<double, JOINT_COUNT> Controller::update() {
     transform::TMatrices tProductsInv = transform::invertTransformMatrices(tProducts);
 
     // Compute error
-    Eigen::Vector3d currentPos = (tProducts[tProducts.size() - 1] *
-                                  Eigen::Vector4d(0, 0, 0, 1)).head<3>();
+    Eigen::Vector3d currentPos = (tProducts[tProducts.size() - 1] * Eigen::Vector4d(0, 0, 0, 1)).head<3>();
     Eigen::Vector3d taskError = targetPos - currentPos;
 
     jacobian::Jacobians vJacobians = jacobian::velocityJacobians(theta, tMatrices, tProducts);
@@ -28,9 +27,10 @@ Eigen::Vector<double, JOINT_COUNT> Controller::update() {
     Eigen::Vector<double, JOINT_COUNT> error = eefJacobian.transpose() * taskError;
 
     // Compute PID values
-    Eigen::Vector<double, JOINT_COUNT> p = error * K_p;
-    Eigen::Vector<double, JOINT_COUNT> i = (integral += error * dt) * K_i;
-    Eigen::Vector<double, JOINT_COUNT> d = (error - prevError) * (K_d / dt);
+    integral += error * dt;
+    const Eigen::Vector<double, JOINT_COUNT> p = error * K_p;
+    const Eigen::Vector<double, JOINT_COUNT> i = integral * K_i;
+    const Eigen::Vector<double, JOINT_COUNT> d = (error - prevError) * (K_d / dt);
     prevError = error;
 
     Eigen::Vector<double, JOINT_COUNT> forces = limitAbs(p + i + d, PID_MAX_FORCE);
@@ -39,7 +39,6 @@ Eigen::Vector<double, JOINT_COUNT> Controller::update() {
     auto apfTorques = apf::computeTorques(tProducts, tProductsInv, vJacobians, oJacobians, obstacles);
 
     // Add torques
-    forces.head<JOINT_COUNT>() += apfTorques;
-
+    forces += apfTorques;
     return forces;
 }
