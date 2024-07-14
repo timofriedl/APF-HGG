@@ -41,7 +41,7 @@ class APFPolicy(Policy):
 
         obstacle_attributes = np.array([], dtype=np.float64)  # TODO add obstacles
 
-        forces = control_step(theta, rl_goal_pos, obstacle_attributes)
+        forces = control_step(theta, rl_goal_pos, rl_goal_rot, obstacle_attributes)
         max_forces = self.envs[0].sim.model.actuator_forcerange[:7, 1]
         action[:7] = forces / max_forces  # Normalize forces to [-1, 1]
 
