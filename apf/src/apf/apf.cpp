@@ -67,9 +67,10 @@ apf::computeTorque(const Capsule &linkCapsule, const Capsule &obstacle, const tr
 }
 
 Eigen::Vector<double, JOINT_COUNT>
-apf::computeTorques(const transform::TMatrices &tProducts, const transform::TMatrices &tProductsInv,
-                    const jacobian::Jacobians &vJacobians, const jacobian::Jacobians &oJacobians,
+apf::computeTorques(const transform::TMatrices &tProducts, const jacobian::Jacobians &vJacobians,
+                    const jacobian::Jacobians &oJacobians,
                     const std::vector<Capsule> &obstacles) {
+    transform::TMatrices tProductsInv = transform::invertTransformMatrices(tProducts);
     Eigen::Vector<double, JOINT_COUNT> torques = Eigen::Vector<double, JOINT_COUNT>::Zero();
 
     for (auto &[i, linkCapsule]: apf::robotCapsules(tProducts)) {

@@ -15,8 +15,8 @@ namespace apf {
                   const jacobian::Jacobian &vJacobian, const jacobian::Jacobian &oJacobian);
 
     Eigen::Vector<double, JOINT_COUNT>
-    computeTorques(const transform::TMatrices &tProducts, const transform::TMatrices &tProductsInv,
-                   const jacobian::Jacobians &vJacobians, const jacobian::Jacobians &oJacobians,
+    computeTorques(const transform::TMatrices &tProducts, const jacobian::Jacobians &vJacobians,
+                   const jacobian::Jacobians &oJacobians,
                    const std::vector<Capsule> &obstacles);
 }
 
