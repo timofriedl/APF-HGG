@@ -40,11 +40,14 @@ class APFPolicy(Policy):
         theta = ob[7:14]
 
         obstacle_attributes = np.array([], dtype=np.float64)  # TODO add obstacles
-        forces = control_step(theta, desired_goal, 1.0, obstacle_attributes)
+        forces = control_step(theta, desired_goal, obstacle_attributes)
+
+        np.set_printoptions(precision=3)
+        print(forces)
 
         max_forces = self.envs[0].sim.model.actuator_forcerange[:7, 1]
 
-        action[:7] = forces[:7] / max_forces
+        action[:7] = forces[:7] / max_forces  # Normalize forces to [-1, 1]
         action[7] = rl_action[7]  # Directly use RL gripper action
 
         return [action], _

@@ -10,7 +10,7 @@ constexpr size_t JOINT_COUNT = 7;
 constexpr double DERIVATIVE_EPSILON = 1E-5;
 
 // PID Controller
-constexpr double K_p = 0.0;
+constexpr double K_p = 100.0;
 constexpr double K_i = 0.0;
 constexpr double K_d = 0.0;
 
