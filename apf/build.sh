@@ -40,4 +40,4 @@ cd "$BUILD_DIR" || { echo "Failed to change directory to $BUILD_DIR"; exit 1; }
 
 # Run CMake and build the project
 cmake ..
-cmake --build .
+cmake --build . -- -j$(nproc)
