@@ -28,8 +28,8 @@ Eigen::Vector<double, JOINT_COUNT> Controller::update() {
     jacobian::Jacobians oJacobians = jacobian::orientationJacobians(tProducts);
 
     // Compute positional error
-    Eigen::Vector3d currentPos = (tProducts[tProducts.size() - 1] * Eigen::Vector4d(0, 0, 0, 1)).head<3>();
-    Eigen::Vector3d taskError = targetPos - currentPos;
+    Eigen::Vector3d currentEefPos = (tProducts[tProducts.size() - 1] * Eigen::Vector4d(0, 0, 0, 1)).head<3>();
+    Eigen::Vector3d taskError = targetPos - currentEefPos;
 
     // Compute orientation error
     Eigen::Quaterniond currentRot(tProducts[JOINT_COUNT].topLeftCorner<3, 3>());

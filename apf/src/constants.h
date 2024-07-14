@@ -10,9 +10,9 @@ constexpr size_t JOINT_COUNT = 7;
 constexpr double DERIVATIVE_EPSILON = 1E-5;
 
 // PID Controller
-constexpr double K_p = 10.0;
-constexpr double K_i = 0.0;
-constexpr double K_d = 1.0;
+constexpr double K_p = 1000.0;
+constexpr double K_i = 1.0;
+constexpr double K_d = 1000.0; // TODO tf tune
 
 constexpr double PID_MAX_FORCE = 1.0E9;
 
