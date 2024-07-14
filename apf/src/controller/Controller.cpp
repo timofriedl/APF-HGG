@@ -47,5 +47,5 @@ Eigen::Vector<double, ACT_COUNT> Controller::update() {
     // Add torques
     forces.head<JOINT_COUNT>() += apfTorques;
 
-    return limitAbs(forces, ACTUAL_MAX_FORCE);
+    return forces;
 }

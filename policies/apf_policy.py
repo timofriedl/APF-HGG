@@ -39,17 +39,13 @@ class APFPolicy(Policy):
 
         q = np.zeros(8)
         q[:7] = ob[7:14]
-        # TODO q[8] = ?
-
-        joint_vel = ob[16:23]
 
         obstacle_attributes = np.array([], dtype=np.float64)  # TODO add obstacles
-        forces = control_step(q, desired_goal, 1.0, obstacle_attributes)  # TODO set target_gripper
+        forces = control_step(q, desired_goal, 1.0, obstacle_attributes)
 
-        # TODO directly apply forces instead of returning [dx, dy, dz, q1, q2, q3, q4]
-        # TODO currently is action the demanded positional offset
+        max_forces = self.envs[0].sim.model.actuator_forcerange[:7, 1]
 
-        action[0:7] = np.zeros(7, dtype=np.float32)
-        action[7] = rl_action[7]
+        action[:7] = forces[:7] / max_forces
+        action[7] = rl_action[7]  # Directly use RL gripper action
 
         return [action], _

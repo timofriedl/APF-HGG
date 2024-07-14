@@ -1,5 +1,6 @@
 import gym
 
+from .fetch.franka_direct_pick_dyn_lifted_obstacles import FrankaDirectFetchPickDynLiftedObstaclesEnv
 from .fetch.franka_pick_3d_target import FrankaFetchPick3DTarget
 from .fetch.franka_pick_3d_target_obstacle import FrankaFetchPick3DTargetObstacle
 from .fetch.franka_pick_dyn_door_obstacles import FrankaFetchPickDynDoorObstaclesEnv
@@ -110,6 +111,12 @@ def register_custom_envs():
     gym.envs.register(
         id='FrankaFetchPick3DTargetObstacle-v1',
         entry_point='envs:FrankaFetchPick3DTargetObstacle',
+        max_episode_steps=100,
+        kwargs={'reward_type': 'sparse', 'n_substeps': 20},
+    )
+    gym.envs.register(
+        id='FrankaDirectFetchPickDynLiftedObstaclesEnv-v1',
+        entry_point='envs:FrankaDirectFetchPickDynLiftedObstaclesEnv',
         max_episode_steps=100,
         kwargs={'reward_type': 'sparse', 'n_substeps': 20},
     )

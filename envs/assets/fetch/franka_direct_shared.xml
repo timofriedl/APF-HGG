@@ -1,5 +1,4 @@
 <!-- "direct" refers to direct torque control (instead of mocap control)
-- removed
 - added actuators from "franka_actuator.xml" -->
 <mujoco>
     <asset>
@@ -113,6 +112,10 @@
         <!--        <jointvel name="fr_fin_jv1" joint="panda0_finger_joint1"/>-->
         <!--        <jointvel name="fr_fin_jv2" joint="panda0_finger_joint2"/>-->
     </sensor>
+
+    <equality>
+        <!-- TODO weld body1="panda0:mocap" body2="eef" solimp="0.999 0.999 0.001" solref="0.01 1"></weld-->
+    </equality>
 
     <size njmax="1000"/>
     <include file='./franka_actuator.xml'/>

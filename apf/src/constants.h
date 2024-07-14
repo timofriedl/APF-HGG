@@ -16,7 +16,6 @@ constexpr double K_i = 0.0;
 constexpr double K_d = 0.0;
 
 constexpr double PID_MAX_FORCE = 1.0E9;
-constexpr double ACTUAL_MAX_FORCE = 1.0E9;
 
 // APF
 constexpr double APF_FORCE_FACTOR = 0.0;
