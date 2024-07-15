@@ -20,7 +20,7 @@ def get_args():
     args, _ = parser.parse_known_args()
 
     parser.add_argument('--goal', help='method of goal generation', type=str, default='vanilla',
-                        choices=['vanilla', 'fixobj', 'interval', 'mpc', 'col_test', 'ghgg_custom'])
+                        choices=['vanilla', 'fixobj', 'interval', 'mpc', 'apf', 'col_test', 'ghgg_custom'])
     if args.env[:5] == 'Fetch':
         parser.add_argument('--init_offset', help='initial offset in fetch environments', type=np.float32, default=1.0)
 

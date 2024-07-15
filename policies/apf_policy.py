@@ -1,17 +1,11 @@
-import copy
 from typing import List
 
 import numpy as np
-import torch
 
 from apf.wrapper import control_step
-from env_ext.fetch import MPCControlGoalEnv
+from env_ext.fetch import APFControlGoalEnv
 from policies.policy import Policy
 from policies.rl_policy import RLPolicy
-import time
-
-step = 0
-durations = []
 
 
 class APFPolicy(Policy):
@@ -26,7 +20,7 @@ class APFPolicy(Policy):
         self.action = np.zeros(8, dtype=np.float32)
         self.dt = 0.0
 
-    def set_envs(self, envs: List[MPCControlGoalEnv]):
+    def set_envs(self, envs: List[APFControlGoalEnv]):
         super().set_envs(envs)
         self.rl_policy.set_envs(envs)
 
@@ -42,7 +36,7 @@ class APFPolicy(Policy):
         self.step = 0
 
     def predict(self, obs: Vector) -> (Vector, InfoVector):
-        if self.step % 10 == 0:  # RL policy is slow, only execute it once every few time steps
+        if self.step % 10 == 0:  # RL policy is slow, only execute it at 100Hz = 1000Hz / 10
             [self.rl_action], _ = self.rl_policy.predict(obs)
 
         self.step += 1
@@ -51,8 +45,7 @@ class APFPolicy(Policy):
         [qw, qx, qy, qz] = [0, 1, 0, 0]  # rl_action[3:7]
         rl_goal_rot = np.array([qx, qy, qz, qw], dtype=np.float32)
         theta = obs[0]["observation"][7:14]
-
-        obstacle_attributes = np.array([], dtype=np.float64)  # TODO add obstacles
+        obstacle_attributes = obs[0]["capsules"]
 
         rl_goal_pos -= np.array([0.8, 0.75, 0.42], dtype=np.float32)  # Robot base frame offset
         forces = control_step(theta, rl_goal_pos, rl_goal_rot, obstacle_attributes, self.dt)

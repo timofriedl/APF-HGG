@@ -3,8 +3,6 @@ from typing import List
 
 import torch
 
-from env_ext.fetch import MPCControlGoalEnv
-
 
 class Policy:
     Vector = List[torch.Tensor]
@@ -12,7 +10,7 @@ class Policy:
 
     envs = []
 
-    def set_envs(self, envs: List[MPCControlGoalEnv]):
+    def set_envs(self, envs: List):
         # environments references
         self.envs = envs
 

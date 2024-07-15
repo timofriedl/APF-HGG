@@ -73,6 +73,8 @@ class FrankaDirectFetchPickDynLiftedObstaclesEnv(robot_env.RobotEnv, gym.utils.E
         self.obstacles = self.dyn_obstacles + self.stat_obstacles
         self.obstacles_geom_names = self.dyn_obstacles_geom_names + self.stat_obstacles_geom_names
 
+        self.obstacle_capsules = np.zeros([len(self.obstacles), 7], dtype=np.float64)
+
         super(FrankaDirectFetchPickDynLiftedObstaclesEnv, self).__init__(
             model_path=model_path, n_substeps=n_substeps, n_actions=8,
             initial_qpos=initial_qpos)
@@ -82,6 +84,7 @@ class FrankaDirectFetchPickDynLiftedObstaclesEnv(robot_env.RobotEnv, gym.utils.E
 
         gym.utils.EzPickle.__init__(self)
         self._setup_dyn_obstacles()
+        self.setup_obstacle_capsules()
 
     def _setup_dyn_obstacles(self):
 
@@ -166,6 +169,28 @@ class FrankaDirectFetchPickDynLiftedObstaclesEnv(robot_env.RobotEnv, gym.utils.E
 
         return updated_dyn_obstacles + self.stat_obstacles
 
+    def setup_obstacle_capsules(self):
+        for i, obstacle in enumerate(self.obstacles):
+            body_id = self.sim.model.body_name2id(
+                ('obstacle', 'obstacle2', 'obstacle3')[i]  # First dynamic, then static
+            )
+            pos = self.sim.data.body_xpos[body_id]
+            rot = self.sim.data.body_xquat[body_id]
+            size = self.obstacles[i][7:10]
+            self.obstacle_capsules[i] = apf_utils.cuboid_to_capsule(pos, rot, size)
+
+    def get_capsules(self) -> np.ndarray:
+        for i in range(len(self.dyn_obstacles)):
+            body_id = self.sim.model.body_name2id(
+                ('obstacle', 'obstacle2')[i]
+            )
+            pos = self.sim.data.body_xpos[body_id]
+            rot = self.sim.data.body_xquat[body_id]
+            size = self.dyn_obstacles[i][7:10]
+            self.obstacle_capsules[i] = apf_utils.cuboid_to_capsule(pos, rot, size)
+
+        return self.obstacle_capsules
+
     def _move_obstacles(self, t):
         old_positions_x = self._compute_obstacle_rel_x_positions(time=t - self.dt)
         new_positions_x = self._compute_obstacle_rel_x_positions(time=t)
@@ -176,7 +201,9 @@ class FrankaDirectFetchPickDynLiftedObstaclesEnv(robot_env.RobotEnv, gym.utils.E
     def step(self, action):
         t = self.sim.get_state().time + self.dt
         self._move_obstacles(t)
-        return super(FrankaDirectFetchPickDynLiftedObstaclesEnv, self).step(action)
+        res = super(FrankaDirectFetchPickDynLiftedObstaclesEnv, self).step(action)
+        res[0]["capsules"] = self.get_capsules()
+        return res
 
     # GoalEnv methods
     # ----------------------------
@@ -278,7 +305,8 @@ class FrankaDirectFetchPickDynLiftedObstaclesEnv(robot_env.RobotEnv, gym.utils.E
             'achieved_goal': achieved_goal.copy(),
             'desired_goal': self.goal.copy(),
             'real_obstacle_info': np.concatenate([dyn_obstacles, stat_obstacles]),
-            'object_dis': obj_dist
+            'object_dis': obj_dist,
+            'capsules': self.get_capsules()
         }
 
     def _viewer_setup(self):
