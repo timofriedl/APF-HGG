@@ -25,10 +25,10 @@ target_rot_values64 = np.zeros(4, dtype=np.float64)
 
 integral_values = np.zeros(JOINT_COUNT, dtype=np.float64)
 prev_error_values = np.zeros(JOINT_COUNT, dtype=np.float64)
-prev_time = -1
 
 
-def control_step(theta: np.ndarray, target_pos_values: np.ndarray, target_rot_values: np.ndarray, obstacle_attributes: np.ndarray):
+def control_step(theta: np.ndarray, target_pos_values: np.ndarray, target_rot_values: np.ndarray,
+                 obstacle_attributes: np.ndarray, dt):
     assert theta.shape[0] == JOINT_COUNT
     assert target_pos_values.shape == (3,)
     assert target_rot_values.shape == (4,)
@@ -36,17 +36,13 @@ def control_step(theta: np.ndarray, target_pos_values: np.ndarray, target_rot_va
         assert obstacle_attributes.ndim == 2
         assert obstacle_attributes.shape[1] == 7
 
-    global prev_time
-    now = time.time()
-    dt = 0.001 if prev_time < 0 else 1.0 / (now - prev_time)
-    prev_time = now
-
     theta64[:] = theta
     target_pos_values64[:] = target_pos_values[:]
     target_rot_values64[:] = target_rot_values[:]
 
     force_result = np.zeros(JOINT_COUNT, dtype=np.float64)
-    lib.step(theta64, target_pos_values64, target_rot_values64, obstacle_attributes.flatten(), obstacle_attributes.shape[0], dt,
+    lib.step(theta64, target_pos_values64, target_rot_values64, obstacle_attributes.flatten(),
+             obstacle_attributes.shape[0], dt,
              integral_values, prev_error_values, force_result)
 
     return force_result
@@ -69,7 +65,10 @@ if __name__ == '__main__':
     ]
     obs_attr = np.array(attr, dtype=np.float64)
 
-    force = control_step(theta_values, target_pos, target_rot, obs_attr)
-    duration = time.time() - prev_time
-    print(force)
-    print("{} Hz".format(1.0 / duration))
+    start_time = time.time()
+    torques = control_step(theta_values, target_pos, target_rot, obs_attr, 0.001)
+    duration = time.time() - start_time
+
+    np.set_printoptions(precision=2)
+    print("Output torques: {}".format(torques))
+    print("Theoretical frequency: %d Hz" % (1.0 / duration))

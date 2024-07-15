@@ -19,8 +19,7 @@ def goal_distance(goal_a, goal_b):
 
 
 class FrankaDirectFetchPickDynLiftedObstaclesEnv(robot_env.RobotEnv, gym.utils.EzPickle):
-    def __init__(self, reward_type='sparse', n_substeps=20):
-
+    def __init__(self, reward_type='sparse', n_substeps=1):
         """Initializes a new Fetch environment.
 
         Args:
@@ -77,6 +76,9 @@ class FrankaDirectFetchPickDynLiftedObstaclesEnv(robot_env.RobotEnv, gym.utils.E
         super(FrankaDirectFetchPickDynLiftedObstaclesEnv, self).__init__(
             model_path=model_path, n_substeps=n_substeps, n_actions=8,
             initial_qpos=initial_qpos)
+
+        if self.sim.nsubsteps != 1:
+            raise ValueError("The substep property must be 1 for APF environments")
 
         gym.utils.EzPickle.__init__(self)
         self._setup_dyn_obstacles()

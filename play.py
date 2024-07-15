@@ -1,3 +1,4 @@
+import os
 import sys
 
 from gym.wrappers.monitoring.video_recorder import VideoRecorder
@@ -71,7 +72,7 @@ class Player:
                 ob, _, _, env_info = env.step(action)
 
                 # end = time.time()
-                # print('Execution time {}: {}'.format(timestep, end - start))
+                # print('Execution time {}: {} ({} Hz)'.format(timestep, end - start, 1 / (end - start)))
 
                 if self.mpc_policy:
                     info = infos[0]
@@ -125,7 +126,7 @@ class Player:
                         env.render()
                         pass
                 else:
-                    env.render()
+                    # env.render()
                     if env_info['Success']:
                         print('Success. Exiting. Time steps: ', timestep)
                         break
@@ -133,10 +134,13 @@ class Player:
             print('Collisions: ', env.collisions)
             print('Errors: ', err_sum)
 
-    def record_video(self, raw_path="myrecord"):
+    def record_video(self, raw_path, test_rollouts=30):
+        directory = os.path.dirname(raw_path)
+        if not os.path.exists(directory):
+            os.makedirs(directory)
+
         env = self.env
         test_col_tolerance = 0
-        test_rollouts = 30
         seed = 3000
         env.np_random.seed(seed)  # TODO remove
         # play policy on env
@@ -145,17 +149,22 @@ class Player:
         acc_sum, obs = 0.0, []
         tol_acc_sum = 0.0
         for i in range(test_rollouts):
+            print("Rollout {} / {}".format(i + 1, test_rollouts))
             env.np_random.seed(seed + i)
-            print('Seed: ', seed + i)
             self.policy.reset()
             ob = env.reset()
             env_info = None
-            print("Rollout {}/{} ...".format(i + 1, test_rollouts))
-            for timestep in range(self.args.timesteps):
+            next_capture_time = 0.0
+            for _ in tqdm(range(self.args.timesteps)):
                 actions, infos = self.policy.predict(obs=[ob])
                 action = actions[0]
                 ob, _, _, env_info = env.step(action)
-                recorder.capture_frame()
+
+                time = env.sim.get_state().time
+                if time >= next_capture_time:
+                    recorder.capture_frame()
+                    next_capture_time += 1.0 / recorder.frames_per_sec
+
                 if env_info['Success']:
                     print('Success. Exiting.')
                     break
@@ -176,5 +185,5 @@ if __name__ == "__main__":
     register_custom_envs()
     # Call play.py in order to see current policy progress
     player = Player(args)
-    player.play()
-    # player.record_video(raw_path="/home/ssc/bachelor-thesis/videos/rollouts_{}_{}".format(args.env, args.play_policy))
+    # player.play()
+    player.record_video(raw_path="./videos/rollouts_{}_{}".format(args.env, args.play_policy), test_rollouts=1)
