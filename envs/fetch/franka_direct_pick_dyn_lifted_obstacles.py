@@ -81,7 +81,7 @@ class FrankaDirectFetchPickDynLiftedObstaclesEnv(robot_env.RobotEnv, gym.utils.E
             initial_qpos=initial_qpos)
 
         if self.sim.nsubsteps != 1:
-            raise ValueError("The substep property must be 1 for APF environments")
+            raise ValueError("--env_n_substeps must be 1 for APF environments")
 
         gym.utils.EzPickle.__init__(self)
         self._setup_dyn_obstacles()

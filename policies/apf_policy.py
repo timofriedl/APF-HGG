@@ -38,7 +38,6 @@ class APFPolicy(Policy):
         self.step = 0
 
     def predict(self, obs: Vector) -> (Vector, InfoVector):
-        print(self.dt)
         # RL policy is slow, only execute it at 100Hz = 1000Hz / 10
         if self.step % 10 == 0:
             [self.rl_action], _ = self.rl_policy.predict(obs)

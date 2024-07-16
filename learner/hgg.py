@@ -6,6 +6,7 @@ from algorithm.replay_buffer import Trajectory, goal_concat
 from env_ext import make_env
 from env_ext.utils import goal_distance
 from utils2.gcc_utils import gcc_load_lib, c_double
+from tqdm import tqdm
 
 
 class TrajectoryPool:
@@ -168,7 +169,7 @@ class HGGLearner:
 
         achieved_trajectories = []
         achieved_init_states = []
-        for i in range(args.episodes):
+        for i in tqdm(range(args.episodes)):
             obs = self.env_List[i].get_obs()
             init_state = obs['observation'].copy()
             explore_goal = self.sampler.sample(i)
@@ -195,8 +196,8 @@ class HGGLearner:
                 agent.target_update()
 
         selection_trajectory_idx = {}
-        for i in range(self.args.episodes):
+        for i in tqdm(range(self.args.episodes)):
             if goal_distance(achieved_trajectories[i][0], achieved_trajectories[i][-1]) > 0.01:
                 selection_trajectory_idx[i] = True
-        for idx in selection_trajectory_idx.keys():
+        for idx in tqdm(selection_trajectory_idx.keys()):
             self.achieved_trajectory_pool.insert(achieved_trajectories[idx].copy(), achieved_init_states[idx].copy())

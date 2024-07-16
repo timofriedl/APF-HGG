@@ -34,8 +34,9 @@ def train():
     args.logger.summary_setup()
     goal_list = None
 
-    for epoch in tqdm(range(args.epochs)):
+    for epoch in range(args.epochs):
         for cycle in range(args.cycles):
+            print("Epoch {} / {}, Cycle {} / {}".format(epoch + 1, args.epochs, cycle + 1, args.cycles))
             args.logger.tabular_clear()
             args.logger.summary_clear()
             start_time = time.time()
