@@ -183,7 +183,6 @@ if __name__ == "__main__":
     mppi_constants.update_k(args.mppi_k, args.device)
 
     register_custom_envs()
-    # Call play.py in order to see current policy progress
     player = Player(args)
     # player.play()
     player.record_video(raw_path="./videos/rollouts_{}_{}".format(args.env, args.play_policy), test_rollouts=1)

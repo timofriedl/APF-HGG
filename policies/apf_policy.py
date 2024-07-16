@@ -19,14 +19,16 @@ class APFPolicy(Policy):
         self.rl_action = None
         self.action = np.zeros(8, dtype=np.float32)
         self.dt = 0.0
+        self.env = None
 
     def set_envs(self, envs: List[APFControlGoalEnv]):
         super().set_envs(envs)
         self.rl_policy.set_envs(envs)
 
-        for env in envs:
-            env.disable_action_limit()
-            self.dt = env.sim.model.opt.timestep
+        assert len(envs) == 1
+        envs[0].disable_action_limit()
+        self.dt = envs[0].sim.model.opt.timestep
+        self.env = envs[0].env
 
     def initial_info(self, obs: Vector) -> InfoVector:
         pass
@@ -36,21 +38,35 @@ class APFPolicy(Policy):
         self.step = 0
 
     def predict(self, obs: Vector) -> (Vector, InfoVector):
-        if self.step % 10 == 0:  # RL policy is slow, only execute it at 100Hz = 1000Hz / 10
+        # RL policy is slow, only execute it at 100Hz = 1000Hz / 10
+        if self.step % 10 == 0:
             [self.rl_action], _ = self.rl_policy.predict(obs)
 
         self.step += 1
 
-        rl_goal_pos = np.array([1.3, 0.3, 0.7], dtype=np.float32)  # self.rl_action[:3] TODO tf
-        [qw, qx, qy, qz] = [0, 1, 0, 0]  # rl_action[3:7]
+        # Limit z position
+        rl_goal_pos = self.rl_action[:3]
+        if self.env.block_z:
+            grip_pos = self.env.sim.data.get_site_xpos('grip_site')
+            target_z = grip_pos[2] + rl_goal_pos[2]
+            if target_z > self.env.block_max_z:
+                # robot can not move higher
+                rl_goal_pos[2] = max(0, self.env.block_max_z - grip_pos[2])
+
+        # Get target orientation
+        [qw, qx, qy, qz] = [0, 1, 0, 0] if self.env.block_orientation else self.rl_action[3:7]
         rl_goal_rot = np.array([qx, qy, qz, qw], dtype=np.float32)
         theta = obs[0]["observation"][7:14]
         obstacle_attributes = obs[0]["capsules"]
 
+        # Compute joint torques
         rl_goal_pos -= np.array([0.8, 0.75, 0.42], dtype=np.float32)  # Robot base frame offset
-        forces = control_step(theta, rl_goal_pos, rl_goal_rot, obstacle_attributes, self.dt)
+        torques = control_step(theta, rl_goal_pos, rl_goal_rot, obstacle_attributes, self.dt)
 
-        max_forces = self.envs[0].sim.model.actuator_forcerange[:7, 1]
-        self.action[:7] = forces / max_forces  # Normalize forces to [-1, 1]
-        self.action[7] = self.rl_action[7]  # Directly use RL gripper action
+        # Limit torques and normalize
+        max_torques = self.envs[0].sim.model.actuator_forcerange[:7, 1]
+        self.action[:7] = torques / max_torques  # Normalize torques to [-1, 1]
+
+        # Directly use RL gripper action
+        self.action[7] = self.rl_action[7]
         return [self.action], None

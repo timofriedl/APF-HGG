@@ -53,6 +53,7 @@ class FrankaDirectFetchPickDynLiftedObstaclesEnv(robot_env.RobotEnv, gym.utils.E
         self.has_object = True
         self.block_object_in_gripper = True
         self.block_z = True
+        self.block_orientation = True
         self.target_in_the_air = False
         self.target_offset = 0.0
         self.obj_range = 0.06  # originally 0.15
@@ -235,8 +236,6 @@ class FrankaDirectFetchPickDynLiftedObstaclesEnv(robot_env.RobotEnv, gym.utils.E
             gripper_ctrl = -0.8
 
         gripper_ctrl = np.array([gripper_ctrl, gripper_ctrl])
-
-        # TODO tf limit gripper max z
 
         action = np.concatenate([action[:7], gripper_ctrl])
 
