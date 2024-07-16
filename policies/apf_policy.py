@@ -56,7 +56,7 @@ class APFPolicy(Policy):
         obstacle_attributes = obs[0]["capsules"]
 
         # Compute joint torques
-        rl_goal_pos -= np.array([0.8, 0.75, 0.42], dtype=np.float32)  # Robot base frame offset
+        rl_goal_pos -= np.array([0.8, 0.75, 0.44], dtype=np.float32)  # Robot base frame offset
         torques = control_step(theta, rl_goal_pos, rl_goal_rot, obstacle_attributes, self.dt)
 
         # Normalize torques to [-1, 1]
