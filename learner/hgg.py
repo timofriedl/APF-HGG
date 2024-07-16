@@ -196,8 +196,8 @@ class HGGLearner:
                 agent.target_update()
 
         selection_trajectory_idx = {}
-        for i in tqdm(range(self.args.episodes)):
+        for i in range(self.args.episodes):
             if goal_distance(achieved_trajectories[i][0], achieved_trajectories[i][-1]) > 0.01:
                 selection_trajectory_idx[i] = True
-        for idx in tqdm(selection_trajectory_idx.keys()):
+        for idx in selection_trajectory_idx.keys():
             self.achieved_trajectory_pool.insert(achieved_trajectories[idx].copy(), achieved_init_states[idx].copy())

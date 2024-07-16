@@ -7,6 +7,7 @@ from typing import List
 import gym
 import numpy as np
 from gym_robotics.envs import rotations, robot_env, utils
+from apf.wrapper import control_step
 
 from utils import apf_utils
 
@@ -76,12 +77,12 @@ class FrankaDirectFetchPickDynLiftedObstaclesEnv(robot_env.RobotEnv, gym.utils.E
 
         self.obstacle_capsules = np.zeros([len(self.obstacles), 7], dtype=np.float64)
 
+        self.direct_action = np.zeros(9, dtype=np.float32)
+        self.robot_offset = np.array([0.8, 0.75, 0.44], dtype=np.float32)
+
         super(FrankaDirectFetchPickDynLiftedObstaclesEnv, self).__init__(
             model_path=model_path, n_substeps=n_substeps, n_actions=8,
             initial_qpos=initial_qpos)
-
-        if self.sim.nsubsteps != 1:
-            raise ValueError("--env_n_substeps must be 1 for APF environments")
 
         gym.utils.EzPickle.__init__(self)
         self._setup_dyn_obstacles()
@@ -226,20 +227,40 @@ class FrankaDirectFetchPickDynLiftedObstaclesEnv(robot_env.RobotEnv, gym.utils.E
     #         self.sim.data.set_joint_qpos('robot0:r_gripper_finger_joint', 0.019)
     #         self.sim.forward()
 
-    def _set_action(self, action):
-        assert action.shape == (8,)
-        action = action.copy()  # ensure that we don't change the action outside of this scope
-        gripper_ctrl = action[7]
+    def _set_action(self, rl_action):
+        # Extract goal position
+        current_pos = self.sim.data.get_body_xpos('eef')
+        rl_goal_pos = current_pos + 0.05 * rl_action[:3]
+        if self.block_z and rl_goal_pos[2] > self.block_max_z:
+            rl_goal_pos[2] = self.block_max_z
 
-        if self.block_gripper:
-            gripper_ctrl = -0.8
+        # Get target orientation
+        [qw, qx, qy, qz] = [0, 1, 0, 0] if self.block_orientation else rl_action[3:7]
+        rl_goal_rot = np.array([qx, qy, qz, qw], dtype=np.float32)
 
-        gripper_ctrl = np.array([gripper_ctrl, gripper_ctrl])
+        # Current joint configuration
+        theta = apf_utils.get_theta(self.sim)
 
-        action = np.concatenate([action[:7], gripper_ctrl])
+        # Obstacle capsules
+        obstacle_attributes = self.get_capsules()
+        obstacle_attributes[:, 0:3] -= self.robot_offset
+        obstacle_attributes[:, 3:6] -= self.robot_offset
+
+        # Compute joint torques
+        rl_goal_pos -= self.robot_offset
+        dt = self.sim.model.opt.timestep
+        torques = control_step(theta, rl_goal_pos, rl_goal_rot, obstacle_attributes, dt)
+
+        # Normalize torques to [-1, 1]
+        self.direct_action[:7] = torques / self.sim.model.actuator_forcerange[:7, 1]
+
+        # Directly use RL gripper action
+        gripper_ctrl = -0.8 if self.block_gripper else rl_action[7]
+        self.direct_action[7] = gripper_ctrl
+        self.direct_action[8] = gripper_ctrl
 
         # Skip the usual mocap control and use direct torque control
-        apf_utils.direct_set_action(self.sim, action)
+        apf_utils.direct_set_action(self.sim, self.direct_action)
 
     def _get_obs(self):
         # positions
