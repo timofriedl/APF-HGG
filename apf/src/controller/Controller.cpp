@@ -3,10 +3,6 @@
 #include "../transform/jacobian.h"
 #include "../apf/apf.h"
 
-inline Eigen::Vector<double, JOINT_COUNT> Controller::limitAbs(const Eigen::Vector<double, JOINT_COUNT> &v, double maxAbsValue) {
-    return v.cwiseMin(maxAbsValue).cwiseMax(-maxAbsValue);
-}
-
 inline Eigen::Vector<double, JOINT_COUNT> Controller::computePidForces(const Eigen::Vector<double, JOINT_COUNT> &error) {
     integral += error * dt;
     const Eigen::Vector<double, JOINT_COUNT> p = error * K_p;
@@ -14,7 +10,7 @@ inline Eigen::Vector<double, JOINT_COUNT> Controller::computePidForces(const Eig
     const Eigen::Vector<double, JOINT_COUNT> d = (error - prevError) * (K_d / dt);
     prevError = error;
 
-    return limitAbs(p + i + d, PID_MAX_FORCE);
+    return (p + i + d).cwiseMin(PID_MAX_FORCE).cwiseMax(PID_MIN_FORCE);
 }
 
 Eigen::Vector<double, JOINT_COUNT> Controller::update() {

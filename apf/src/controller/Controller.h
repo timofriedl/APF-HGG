@@ -16,8 +16,6 @@ class Controller {
     Eigen::Vector<double, JOINT_COUNT> &prevError;
     const double dt;
 
-    static Eigen::Vector<double, JOINT_COUNT> limitAbs(const Eigen::Vector<double, JOINT_COUNT> &v, double maxAbsValue);
-
     Eigen::Vector<double, JOINT_COUNT> computePidForces(const Eigen::Vector<double, JOINT_COUNT> &error);
 
 public:

@@ -41,7 +41,7 @@ class APFPolicy(Policy):
 
         self.step += 1
 
-        rl_goal_pos = self.rl_action[:3]
+        rl_goal_pos = np.array([1.3, 0.3, 0.7], dtype=np.float32)  # self.rl_action[:3] TODO tf
         [qw, qx, qy, qz] = [0, 1, 0, 0]  # rl_action[3:7]
         rl_goal_rot = np.array([qx, qy, qz, qw], dtype=np.float32)
         theta = obs[0]["observation"][7:14]
