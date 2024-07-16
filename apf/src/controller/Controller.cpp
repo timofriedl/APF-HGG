@@ -10,7 +10,13 @@ inline Eigen::Vector<double, JOINT_COUNT> Controller::computePidForces(const Eig
     const Eigen::Vector<double, JOINT_COUNT> d = (error - prevError) * (K_d / dt);
     prevError = error;
 
-    return (p + i + d).cwiseMin(PID_MAX_FORCE).cwiseMax(PID_MIN_FORCE);
+    Eigen::Vector<double, JOINT_COUNT> forces = p + i + d;
+
+    // Clamp each element of forces to the range [PID_MIN_FORCE, PID_MAX_FORCE]
+    for (Eigen::Index j = 0; j < JOINT_COUNT; j++)
+        forces[j] = std::max(PID_MIN_FORCE[j], std::min(forces[j], PID_MAX_FORCE[j]));
+
+    return forces;
 }
 
 Eigen::Vector<double, JOINT_COUNT> Controller::update() {
