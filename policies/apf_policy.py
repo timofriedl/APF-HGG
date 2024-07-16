@@ -44,14 +44,10 @@ class APFPolicy(Policy):
 
         self.step += 1
 
-        # Limit z position
+        # Extract goal position
         rl_goal_pos = self.rl_action[:3]
-        if self.env.block_z:
-            grip_pos = self.env.sim.data.get_site_xpos('grip_site')
-            target_z = grip_pos[2] + rl_goal_pos[2]
-            if target_z > self.env.block_max_z:
-                # robot can not move higher
-                rl_goal_pos[2] = max(0, self.env.block_max_z - grip_pos[2])
+        if self.env.block_z and rl_goal_pos[2] > self.env.block_max_z:
+            rl_goal_pos[2] = self.env.block_max_z
 
         # Get target orientation
         [qw, qx, qy, qz] = [0, 1, 0, 0] if self.env.block_orientation else self.rl_action[3:7]
@@ -63,9 +59,8 @@ class APFPolicy(Policy):
         rl_goal_pos -= np.array([0.8, 0.75, 0.42], dtype=np.float32)  # Robot base frame offset
         torques = control_step(theta, rl_goal_pos, rl_goal_rot, obstacle_attributes, self.dt)
 
-        # Limit torques and normalize
-        max_torques = self.envs[0].sim.model.actuator_forcerange[:7, 1]
-        self.action[:7] = torques / max_torques  # Normalize torques to [-1, 1]
+        # Normalize torques to [-1, 1]
+        self.action[:7] = torques / self.envs[0].sim.model.actuator_forcerange[:7, 1]
 
         # Directly use RL gripper action
         self.action[7] = self.rl_action[7]
