@@ -4,6 +4,7 @@ import tensorflow as tf
 import time
 import pickle5 as pickle
 from envs import register_custom_envs
+from tqdm import tqdm
 
 
 def train():
@@ -33,7 +34,7 @@ def train():
     args.logger.summary_setup()
     goal_list = None
 
-    for epoch in range(args.epochs):
+    for epoch in tqdm(range(args.epochs)):
         for cycle in range(args.cycles):
             args.logger.tabular_clear()
             args.logger.summary_clear()

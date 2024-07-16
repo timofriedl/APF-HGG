@@ -203,7 +203,6 @@ class FrankaDirectFetchPickDynLiftedObstaclesEnv(robot_env.RobotEnv, gym.utils.E
         t = self.sim.get_state().time + self.dt
         self._move_obstacles(t)
         res = super(FrankaDirectFetchPickDynLiftedObstaclesEnv, self).step(action)
-        res[0]["capsules"] = self.get_capsules()
         return res
 
     # GoalEnv methods
@@ -304,8 +303,7 @@ class FrankaDirectFetchPickDynLiftedObstaclesEnv(robot_env.RobotEnv, gym.utils.E
             'achieved_goal': achieved_goal.copy(),
             'desired_goal': self.goal.copy(),
             'real_obstacle_info': np.concatenate([dyn_obstacles, stat_obstacles]),
-            'object_dis': obj_dist,
-            'capsules': self.get_capsules()
+            'object_dis': obj_dist
         }
 
     def _viewer_setup(self):

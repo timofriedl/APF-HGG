@@ -48,7 +48,7 @@ apf::computeTorque(const Capsule &linkCapsule, const Capsule &obstacle, const tr
     // Compute the force vector acting on the border of the link capsule.
     // 'dis' may be negative if collisions occur. It then reverses the incorrectly directed vector to restore it as a repulsive vector.
     const Eigen::Vector3d &act = line.getTo();
-    const Eigen::Vector3d forceVector = (act - line.getFrom()) * forceMagnitude / dis;
+    const Eigen::Vector3d forceVector = (line.getFrom() - act) * forceMagnitude / dis;
 
     // Position of acting force in the frame i
     const Eigen::Vector3d v = (tProductInv * Eigen::Vector4d(act.x(), act.y(), act.z(), 1)).head<3>();

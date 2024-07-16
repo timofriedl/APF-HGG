@@ -61,7 +61,7 @@ class APFPolicy(Policy):
         robot_offset = np.array([0.8, 0.75, 0.44], dtype=np.float32)
 
         # Obstacle capsules
-        obstacle_attributes = obs[0]["capsules"]
+        obstacle_attributes = self.env.get_capsules()
         obstacle_attributes[:, 0:3] -= robot_offset
         obstacle_attributes[:, 3:6] -= robot_offset
 
