@@ -45,7 +45,8 @@ class APFPolicy(Policy):
         self.step += 1
 
         # Extract goal position
-        rl_goal_pos = self.rl_action[:3]
+        current_pos = obs[0]['observation'][0:3]
+        rl_goal_pos = current_pos + 0.05 * self.rl_action[:3]
         if self.env.block_z and rl_goal_pos[2] > self.env.block_max_z:
             rl_goal_pos[2] = self.env.block_max_z
 
