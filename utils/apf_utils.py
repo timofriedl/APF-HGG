@@ -3,7 +3,7 @@ import math
 import numpy as np
 from gym_robotics.envs import rotations
 
-SQRT_3_HALF = 0.5 * math.sqrt(3)
+SQRT_3_HALF = 0.5 * math.sqrt(3.0)
 
 
 def direct_set_action(sim, action: np.ndarray) -> None:

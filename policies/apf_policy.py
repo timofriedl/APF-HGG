@@ -53,11 +53,20 @@ class APFPolicy(Policy):
         # Get target orientation
         [qw, qx, qy, qz] = [0, 1, 0, 0] if self.env.block_orientation else self.rl_action[3:7]
         rl_goal_rot = np.array([qx, qy, qz, qw], dtype=np.float32)
+
+        # Current joint configuration
         theta = obs[0]["observation"][7:14]
+
+        # Robot base frame offset
+        robot_offset = np.array([0.8, 0.75, 0.44], dtype=np.float32)
+
+        # Obstacle capsules
         obstacle_attributes = obs[0]["capsules"]
+        obstacle_attributes[:, 0:3] -= robot_offset
+        obstacle_attributes[:, 3:6] -= robot_offset
 
         # Compute joint torques
-        rl_goal_pos -= np.array([0.8, 0.75, 0.44], dtype=np.float32)  # Robot base frame offset
+        rl_goal_pos -= robot_offset
         torques = control_step(theta, rl_goal_pos, rl_goal_rot, obstacle_attributes, self.dt)
 
         # Normalize torques to [-1, 1]
