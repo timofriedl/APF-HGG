@@ -1,8 +1,7 @@
 #include "apf.h"
-#include <iostream>
 
 std::vector<std::pair<size_t, Capsule>> apf::robotCapsules(const transform::TMatrices &tProducts) {
-    std::vector<std::tuple<size_t, Eigen::Vector4d, Eigen::Vector4d, double>> coordinates = {
+    const std::vector<std::tuple<size_t, Eigen::Vector4d, Eigen::Vector4d, double>> coordinates = {
             {0, {0,    0,     -0.333, 1}, {0,    0,      0,      1}, 0.07},  // Torso     (1. Frame)
             {1, {0,    0,     -0.055, 1}, {0,    0,      0.055,  1}, 0.075}, // Shoulder  (2. Frame)
             {2, {0,    0,     -0.064, 1}, {0,    0,      -0.316, 1}, 0.07},  // Upper arm (3. Frame)
@@ -76,12 +75,17 @@ apf::computeTorques(const transform::TMatrices &tProducts, const jacobian::Jacob
     transform::TMatrices tProductsInv = transform::invertTransformMatrices(tProducts);
     Eigen::Vector<double, JOINT_COUNT> torques = Eigen::Vector<double, JOINT_COUNT>::Zero();
 
-    for (auto &[i, linkCapsule]: apf::robotCapsules(tProducts)) {
-        for (auto &obstacle: obstacles) {
+    const auto robotCapsules = apf::robotCapsules(tProducts);
+    for (auto &[i, linkCapsule]: robotCapsules) {
+        // Obstacle collision
+        for (auto &obstacle: obstacles)
             torques += apf::computeTorque(linkCapsule, obstacle, tProductsInv[i], vJacobians[i], oJacobians[i]);
-        }
 
-        // TODO tf self-collision
+        // Self-collision
+        for (auto &[j, otherLinkCapsule]: robotCapsules)
+            if (j < i - 2 || j > i + 2) // Don't check self-collision with closely neighbored links
+                torques += apf::computeTorque(linkCapsule, otherLinkCapsule, tProductsInv[i], vJacobians[i],
+                                              oJacobians[i]);
     }
 
     return torques;
