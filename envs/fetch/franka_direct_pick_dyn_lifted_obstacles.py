@@ -79,6 +79,9 @@ class FrankaDirectFetchPickDynLiftedObstaclesEnv(robot_env.RobotEnv, gym.utils.E
 
         self.direct_action = np.zeros(9, dtype=np.float32)
         self.robot_offset = np.array([0.8, 0.75, 0.44], dtype=np.float32)
+        self.pid_integral = np.zeros(7, dtype=np.float64)
+        self.pid_prev_error = np.zeros(7, dtype=np.float64)
+        self.rl_goal_pos = np.zeros(3, dtype=np.float64)
 
         super(FrankaDirectFetchPickDynLiftedObstaclesEnv, self).__init__(
             model_path=model_path, n_substeps=n_substeps, n_actions=8,
@@ -230,13 +233,13 @@ class FrankaDirectFetchPickDynLiftedObstaclesEnv(robot_env.RobotEnv, gym.utils.E
     def _set_action(self, rl_action):
         # Extract goal position
         current_pos = self.sim.data.get_body_xpos('eef')
-        rl_goal_pos = current_pos + 0.05 * rl_action[:3]
-        if self.block_z and rl_goal_pos[2] > self.block_max_z:
-            rl_goal_pos[2] = self.block_max_z
+        self.rl_goal_pos = current_pos + 0.05 * rl_action[:3]
+        if self.block_z and self.rl_goal_pos[2] > self.block_max_z:
+            self.rl_goal_pos[2] = self.block_max_z
 
         # Get target orientation
         [qw, qx, qy, qz] = [0, 1, 0, 0] if self.block_orientation else rl_action[3:7]
-        rl_goal_rot = np.array([qx, qy, qz, qw], dtype=np.float32)
+        rl_goal_rot = np.array([qx, qy, qz, qw], dtype=np.float64)
 
         # Current joint configuration
         theta = apf_utils.get_theta(self.sim)
@@ -247,9 +250,9 @@ class FrankaDirectFetchPickDynLiftedObstaclesEnv(robot_env.RobotEnv, gym.utils.E
         obstacle_attributes[:, 3:6] -= self.robot_offset
 
         # Compute joint torques
-        rl_goal_pos -= self.robot_offset
+        self.rl_goal_pos -= self.robot_offset
         dt = self.sim.model.opt.timestep
-        torques = control_step(theta, rl_goal_pos, rl_goal_rot, obstacle_attributes, dt)
+        torques = control_step(theta, self.rl_goal_pos, rl_goal_rot, obstacle_attributes, dt, self.pid_integral, self.pid_prev_error)
 
         # Normalize torques to [-1, 1]
         self.direct_action[:7] = torques / self.sim.model.actuator_forcerange[:7, 1]
@@ -348,6 +351,10 @@ class FrankaDirectFetchPickDynLiftedObstaclesEnv(robot_env.RobotEnv, gym.utils.E
     def _reset_sim(self):
         self.sim.set_state(self.initial_state)
 
+        # Reset PID integral and error values
+        self.pid_integral = np.zeros(7, np.float64)
+        self.pid_prev_error = np.zeros(7, np.float64)
+
         # Randomize start position of object.
         if self.has_object:
             object_xpos = self.initial_gripper_xpos[:2]
@@ -378,18 +385,6 @@ class FrankaDirectFetchPickDynLiftedObstaclesEnv(robot_env.RobotEnv, gym.utils.E
         # lower velocity for rectangle obstacle
         self.current_obstacle_vels[1] = directions[1] * self.np_random.uniform(self.vel_lims2[0], self.vel_lims2[1],
                                                                                size=1)
-        # self.current_obstacle_shifts[0] = 0.38997551  # Just for reproduction purpose
-        # self.current_obstacle_shifts[1] = 0.54387205  # Just for reproduction purpose
-        # self.current_obstacle_shifts[2] = 0.48796797  # Just for reproduction purpose
-        # self.current_obstacle_vels[0] = -0.64831615  # Just for reproduction purpose
-        # self.current_obstacle_vels[1] = 0.4220434  # Just for reproduction purpose
-
-        # print("Directions")
-        # print(directions)
-        # print("Obstacle Shifts")
-        # print(self.current_obstacle_shifts)
-        # print("Obstacle Vels")
-        # print(self.current_obstacle_vels)
         self._move_obstacles(t=self.sim.get_state().time)  # move obstacles to the initial positions
 
         self.sim.forward()

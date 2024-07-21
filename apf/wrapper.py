@@ -19,29 +19,23 @@ lib.step.argtypes = [
     np.ctypeslib.ndpointer(dtype=np.float64, ndim=1)  # double forceResult[ACT_COUNT]
 ]
 
-theta64 = np.zeros(JOINT_COUNT, dtype=np.float64)
-target_pos_values64 = np.zeros(3, dtype=np.float64)
-target_rot_values64 = np.zeros(4, dtype=np.float64)
-
-integral_values = np.zeros(JOINT_COUNT, dtype=np.float64)
-prev_error_values = np.zeros(JOINT_COUNT, dtype=np.float64)
-
 
 def control_step(theta: np.ndarray, target_pos_values: np.ndarray, target_rot_values: np.ndarray,
-                 obstacle_attributes: np.ndarray, dt):
+                 obstacle_attributes: np.ndarray, dt, integral_values: np.ndarray, prev_error_values: np.ndarray):
     assert theta.shape[0] == JOINT_COUNT
     assert target_pos_values.shape == (3,)
     assert target_rot_values.shape == (4,)
+    assert integral_values.shape == (JOINT_COUNT,)
+    assert prev_error_values.shape == (JOINT_COUNT,)
+    assert theta.dtype == np.float64
+    assert target_pos_values.dtype == np.float64
+    assert target_rot_values.dtype == np.float64
     if len(obstacle_attributes) > 0:
         assert obstacle_attributes.ndim == 2
         assert obstacle_attributes.shape[1] == 7
 
-    theta64[:] = theta
-    target_pos_values64[:] = target_pos_values[:]
-    target_rot_values64[:] = target_rot_values[:]
-
     force_result = np.zeros(JOINT_COUNT, dtype=np.float64)
-    lib.step(theta64, target_pos_values64, target_rot_values64, obstacle_attributes.flatten(),
+    lib.step(theta, target_pos_values, target_rot_values, obstacle_attributes.flatten(),
              obstacle_attributes.shape[0], dt,
              integral_values, prev_error_values, force_result)
 
@@ -53,8 +47,10 @@ if __name__ == '__main__':
 
     np.random.seed = 42
     theta_values = np.random.rand(JOINT_COUNT)
-    target_pos = np.zeros(3, dtype=np.float32)
-    target_rot = np.array([0, 1, 0, 0], dtype=np.float32)
+    target_pos = np.zeros(3, dtype=np.float64)
+    target_rot = np.array([0, 1, 0, 0], dtype=np.float64)
+    integral = np.zeros(JOINT_COUNT, dtype=np.float64)
+    prev_error = np.zeros(JOINT_COUNT, dtype=np.float64)
 
     attr = [
         [0, 1, 2, 3, 4, 5, 6],
@@ -66,7 +62,7 @@ if __name__ == '__main__':
     obs_attr = np.array(attr, dtype=np.float64)
 
     start_time = time.time()
-    torques = control_step(theta_values, target_pos, target_rot, obs_attr, 0.001)
+    torques = control_step(theta_values, target_pos, target_rot, obs_attr, 0.001, integral, prev_error)
     duration = time.time() - start_time
 
     np.set_printoptions(precision=2)

@@ -41,7 +41,7 @@ def cuboid_to_capsule(pos: np.ndarray, rot: np.ndarray, size: np.ndarray) -> np.
 
 
 def get_theta(sim) -> np.ndarray:
-    theta = np.zeros(7, dtype=np.float32)
+    theta = np.zeros(7, dtype=np.float64)
     names = [n for n in sim.model.joint_names if n.startswith("robot")]
     for i in range(7):
         theta[i] = sim.data.get_joint_qpos(names[i])
