@@ -5,7 +5,7 @@ std::vector<std::pair<size_t, Capsule>> apf::robotCapsules(const transform::TMat
     std::vector<std::tuple<size_t, Eigen::Vector4d, Eigen::Vector4d, double>> coordinates = {
             {3, {0,    0,     -0.055, 1}, {0,    0,      0.055, 1}, 0.075}, // Elbow (4. Frame)
             {4, {0,    0,     -0.23,  1}, {0,    0,      -0.32, 1}, 0.07}, // Forearm 1 (5. Frame)
-            // {4, {0, 0.07, -0.18, 1}, 5, {0, 0, -0.1, 1}, 0.045}, // Forearm 2 (5. & 6. Frame) TODO tf model this using only one link and not two
+            {4, {0,    0.07,  -0.18,  1}, {0,    0.07,      0,  1}, 0.045}, // Forearm 2 (5. & 6. Frame)
             {5, {0,    0,     -0.08,  1}, {0,    0,      0.01,  1}, 0.067}, // Wrist (6. Frame)
             {6, {0,    0,     -0.04,  1}, {0,    0,      0.175, 1}, 0.065}, // Hand 1 (7. Frame)
             {6, {0,    0.061, 0.13,   1}, {0,    -0.061, 0.13,  1}, 0.065}, // Hand 2 (7. Frame)
