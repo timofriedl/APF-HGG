@@ -223,7 +223,7 @@ class FrankaDirectFetchPickDynLiftedObstaclesEnv(robot_env.RobotEnv, gym.utils.E
     def _set_action(self, rl_action):
         # Extract goal position
         current_pos = self.sim.data.get_body_xpos('eef')
-        self.rl_goal_pos = current_pos + 0.05 * rl_action[:3]
+        self.rl_goal_pos = current_pos + rl_action[:3]
         if self.block_z and self.rl_goal_pos[2] > self.block_max_z:
             self.rl_goal_pos[2] = self.block_max_z
 
