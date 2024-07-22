@@ -1,4 +1,5 @@
 #include "apf.h"
+#include <iostream>
 
 std::vector<std::pair<size_t, Capsule>> apf::robotCapsules(const transform::TMatrices &tProducts) {
     const std::vector<std::tuple<size_t, Eigen::Vector4d, Eigen::Vector4d, double>> coordinates = {
@@ -10,20 +11,42 @@ std::vector<std::pair<size_t, Capsule>> apf::robotCapsules(const transform::TMat
             {4, {0,    0.07,  -0.18,  1}, {0,    0.07,   0,      1}, 0.045}, // Forearm 2 (5. Frame)
             {5, {0,    0,     -0.08,  1}, {0,    0,      0.01,   1}, 0.067}, // Wrist     (6. Frame)
             {6, {0,    0,     -0.04,  1}, {0,    0,      0.175,  1}, 0.065}, // Hand 1    (7. Frame)
-            {6, {0,    0.061, 0.13,   1}, {0,    -0.061, 0.13,   1}, 0.065}, // Hand 2    (7. Frame)
+            {7, {0,    0.061, -0.115, 1}, {0,    -0.061, -0.115, 1}, 0.065}, // Hand 2    (Flange Frame)
             {6, {0.03, 0.06,  0.085,  1}, {0.06, 0.03,   0.085,  1}, 0.035}  // Hand 3    (7. Frame)
     };
 
     std::vector<std::pair<size_t, Capsule>> robotCapsules;
     robotCapsules.reserve(coordinates.size());
     for (auto &[linkId, fromPoint, toPoint, radius]: coordinates) {
-        assert(linkId < JOINT_COUNT);
+        assert(linkId <= JOINT_COUNT);
         assert(fromPoint[3] == 1);
         assert(toPoint[3] == 1);
         assert(radius > 0);
         Eigen::Vector3d from = (tProducts[linkId] * fromPoint).head<3>();
         Eigen::Vector3d to = (tProducts[linkId] * toPoint).head<3>();
         Line line = {std::move(from), std::move(to)};
+
+        /* Debugging output
+
+        Eigen::Vector3d offset{0.8, 0.75, 0.44};
+        auto f = line.getFrom() + offset;
+        auto t = line.getTo() + offset;
+        auto d = t - f;
+        auto halfLength = 0.5 * d.norm();
+        auto p = 0.5 * (t + f);
+        Eigen::Vector3d zAxis(0.0, 0.0, 1.0);
+        Eigen::Quaterniond quaternion = Eigen::Quaterniond::FromTwoVectors(zAxis, d);
+        auto rotMatrix = quaternion.toRotationMatrix();
+        auto rot = rotMatrix.eulerAngles(0, 1, 2);
+
+        std::cout << "<body name=\"capsule" << i << "\" pos=\"0 0 0\">\n"
+            << "    <geom type=\"capsule\" name=\"capsule" << i << ":geom\" size=\"" << radius << " " << halfLength
+            << "\" pos=\"" << p[0] << " " << p[1] << " " << p[2]
+            << "\" euler=\"" << rot[0] << " " << rot[1] << " " << rot[2] << "\" rgba=\"1 0 0 0.2\"/>\n"
+            << "</body>\n";
+
+        i++; */
+
         robotCapsules.push_back({linkId, {std::move(line), radius}});
     }
 

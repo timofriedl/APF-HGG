@@ -46,7 +46,8 @@ if __name__ == '__main__':
     print("Trying the APF-HGG C++ library...")
 
     np.random.seed = 42
-    theta_values = np.random.rand(JOINT_COUNT)
+    theta_values = np.array([-1.5531603498364208, -1.1783930647650682, 1.993011792106189, -2.045070748792923,
+                             1.3757972477995606, 2.107712606001714, 0.4674864089863272], dtype=np.float64)
     target_pos = np.zeros(3, dtype=np.float64)
     target_rot = np.array([0, 1, 0, 0], dtype=np.float64)
     integral = np.zeros(JOINT_COUNT, dtype=np.float64)

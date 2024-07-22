@@ -220,16 +220,6 @@ class FrankaDirectFetchPickDynLiftedObstaclesEnv(robot_env.RobotEnv, gym.utils.E
         else:
             return -d
 
-    # RobotEnv methods
-    # ----------------------------
-
-    # def _step_callback(self):
-    #     # initially close gripper
-    #     if self.block_object_in_gripper and self.block_gripper:
-    #         self.sim.data.set_joint_qpos('robot0:l_gripper_finger_joint', 0.019)
-    #         self.sim.data.set_joint_qpos('robot0:r_gripper_finger_joint', 0.019)
-    #         self.sim.forward()
-
     def _set_action(self, rl_action):
         # Extract goal position
         current_pos = self.sim.data.get_body_xpos('eef')
@@ -252,7 +242,8 @@ class FrankaDirectFetchPickDynLiftedObstaclesEnv(robot_env.RobotEnv, gym.utils.E
         # Compute joint torques
         self.rl_goal_pos -= self.robot_offset
         dt = self.sim.model.opt.timestep
-        torques = control_step(theta, self.rl_goal_pos, rl_goal_rot, obstacle_attributes, dt, self.pid_integral, self.pid_prev_error)
+        torques = control_step(theta, self.rl_goal_pos, rl_goal_rot, obstacle_attributes, dt, self.pid_integral,
+                               self.pid_prev_error)
 
         # Normalize torques to [-1, 1]
         self.direct_action[:7] = torques / self.sim.model.actuator_forcerange[:7, 1]
