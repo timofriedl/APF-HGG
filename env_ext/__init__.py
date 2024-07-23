@@ -16,7 +16,9 @@ Robotics_envs_id = [
     'FrankaFetchPickDynObstaclesEnv-v1',
     'FrankaFetchPick3DTarget-v1',
     'FrankaFetchPick3DTargetObstacle-v1',
-    'FrankaDirectFetchPickDynLiftedObstaclesEnv-v1'
+    'FrankaDirectFetchPickDynLiftedObstaclesEnv-v1',
+    'FrankaDirectFetchPick3DTargetObstacle-v1',
+    'FrankaDirectFetchPick3DTarget-v1'
 ]
 
 
@@ -50,5 +52,7 @@ def clip_return_range(args):
         'FrankaFetchPickDynObstaclesEnv-v1': (gamma_sum_min, gamma_sum_max),
         'FrankaFetchPick3DTarget-v1': (gamma_sum_min, gamma_sum_max),
         'FrankaFetchPick3DTargetObstacle-v1': (gamma_sum_min, gamma_sum_max),
-        'FrankaDirectFetchPickDynLiftedObstaclesEnv-v1': (gamma_sum_min, gamma_sum_max)
+        'FrankaDirectFetchPickDynLiftedObstaclesEnv-v1': (gamma_sum_min, gamma_sum_max),
+        'FrankaDirectFetchPick3DTargetObstacle-v1': (gamma_sum_min, gamma_sum_max),
+        'FrankaDirectFetchPick3DTarget-v1': (gamma_sum_min, gamma_sum_max)
     }[args.env]

@@ -15,6 +15,8 @@ from .fetch.pick_dyn_obstacles import FetchPickDynObstaclesEnv
 from .fetch.pick_dyn_obstacles2 import FetchPickDynObstaclesEnv2
 from .fetch.pick_dyn_obstacles_max import FetchPickDynObstaclesMaxEnv
 from .fetch.pick_dyn_sqr_obstacle import FetchPickDynSqrObstacleEnv
+from .fetch.franka_direct_pick_3d_target_obstacle import FrankaDirectFetchPick3DTargetObstacle
+from .fetch.franka_direct_pick_3d_target import FrankaDirectFetchPick3DTarget
 
 
 def register_custom_envs():
@@ -117,6 +119,18 @@ def register_custom_envs():
     gym.envs.register(
         id='FrankaDirectFetchPickDynLiftedObstaclesEnv-v1',
         entry_point='envs:FrankaDirectFetchPickDynLiftedObstaclesEnv',
-        max_episode_steps=1000,
-        kwargs={'reward_type': 'sparse', 'n_substeps': 1},
+        max_episode_steps=100,
+        kwargs={'reward_type': 'sparse', 'n_substeps': 10},
+    )
+    gym.envs.register(
+        id='FrankaDirectFetchPick3DTargetObstacle-v1',
+        entry_point='envs:FrankaDirectFetchPick3DTargetObstacle',
+        max_episode_steps=100,
+        kwargs={'reward_type': 'sparse', 'n_substeps': 10},
+    )
+    gym.envs.register(
+        id='FrankaDirectFetchPick3DTarget-v1',
+        entry_point='envs:FrankaDirectFetchPick3DTarget',
+        max_episode_steps=100,
+        kwargs={'reward_type': 'sparse', 'n_substeps': 10},
     )
