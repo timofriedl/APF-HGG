@@ -12,12 +12,12 @@ You can find the C++ implementation of the APF PID controller in `./apf`.
 
 Train using
 ```bash
-python train2.py --alg ddpg2 --epochs 5 --env FrankaDirectFetchPickDynObstaclesEnv-v1 --reward_min -10 --goal apf --timesteps 500 --env_n_substeps 10
+python train2.py --alg ddpg2 --epochs 20 --env FrankaDirectFetchPickDynLiftedObstaclesEnv-v1 --reward_min -10 --goal apf --timesteps 100 --env_n_substeps 10
 ```
 
 Play video using
 ```bash
-python play.py --env FrankaDirectFetchPickDynObstaclesEnv-v1 --play_path log/ddpg2-FrankaDirectFetchPickDynObstaclesEnv-v1-hgg/ --play_epoch 19 --goal apf --play_policy APFPolicy --timesteps 1000 --env_n_substeps 10
+python play.py --env FrankaDirectFetchPickDynLiftedObstaclesEnv-v1 --play_path log/ddpg2-FrankaDirectFetchPickDynLiftedObstaclesEnv-v1-hgg/ --play_epoch 19 --goal apf --play_policy APFPolicy --timesteps 1000 --env_n_substeps 10
 ```
 
 Note that APF environments run at 1000Hz, while other environments are usually set to 500Hz. Therefore, `--env_n_substeps 10` corresponds to a RL policy frequency of 100Hz.

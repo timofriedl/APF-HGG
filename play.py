@@ -185,4 +185,4 @@ if __name__ == "__main__":
     register_custom_envs()
     player = Player(args)
     # player.play()
-    player.record_video(raw_path="./videos/rollouts_{}_{}".format(args.env, args.play_policy), test_rollouts=1)
+    player.record_video(raw_path="./videos/rollouts_{}_{}".format(args.env, args.play_policy), test_rollouts=5)

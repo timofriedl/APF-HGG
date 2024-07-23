@@ -151,7 +151,7 @@ class FrankaDirectFetchPickDynLiftedObstaclesEnv(robot_env.RobotEnv, gym.utils.E
 
         for i in range(self.n_moving_obstacles):
             max_q = self.pos_difs[i]
-            s_q = max_q * 4
+            s_q = max_q * 16  # TODO tf 4
             v = self.current_obstacle_vels[i]
             a = max_q  # amplitude
             p = s_q / v  # period
@@ -206,8 +206,7 @@ class FrankaDirectFetchPickDynLiftedObstaclesEnv(robot_env.RobotEnv, gym.utils.E
     def step(self, action):
         t = self.sim.get_state().time + self.dt
         self._move_obstacles(t)
-        res = super(FrankaDirectFetchPickDynLiftedObstaclesEnv, self).step(action)
-        return res
+        return super(FrankaDirectFetchPickDynLiftedObstaclesEnv, self).step(action)
 
     # GoalEnv methods
     # ----------------------------

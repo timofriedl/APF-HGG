@@ -19,8 +19,8 @@ constexpr std::array<double, JOINT_COUNT> PID_MIN_FORCE{-87.0, -87.0, -87.0, -87
 constexpr std::array<double, JOINT_COUNT> PID_MAX_FORCE{87.0, 87.0, 87.0, 87.0, 12.0, 12.0, 12.0};
 
 // APF
-constexpr double APF_FORCE_FACTOR = 0.15;
-constexpr double APF_MAX_FORCE = 1.0E20;
+constexpr double APF_FORCE_FACTOR = 0.1;
+constexpr double APF_MAX_FORCE = 1.0E10;
 constexpr double CUTOFF_RADIUS = 0.25;
 
 #endif //APF_HGG_CORE_CONSTANTS_H
