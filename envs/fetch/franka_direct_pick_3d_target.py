@@ -15,7 +15,7 @@ def goal_distance(goal_a, goal_b):
 
 
 class FrankaDirectFetchPick3DTarget(robot_env.RobotEnv, gym.utils.EzPickle):
-    def __init__(self, reward_type='sparse', n_substeps=20):
+    def __init__(self, reward_type='sparse', n_substeps=1):
 
         """Initializes a new Fetch environment.
 

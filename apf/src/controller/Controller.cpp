@@ -2,6 +2,7 @@
 #include "../transform/transform.h"
 #include "../transform/jacobian.h"
 #include "../apf/apf.h"
+#include <iostream>
 
 inline Eigen::Vector<double, JOINT_COUNT> Controller::computePidForces(const Eigen::Vector<double, JOINT_COUNT> &error) {
     integral += error * dt;
@@ -32,6 +33,16 @@ Eigen::Vector<double, JOINT_COUNT> Controller::update() {
     // Compute positional error
     Eigen::Vector3d currentEefPos = (tProducts[tProducts.size() - 1] * Eigen::Vector4d(0, 0, 0, 1)).head<3>();
     Eigen::Vector3d taskError = targetPos - currentEefPos;
+    std::cout << taskError.norm() << "\n";
+
+    // Limit task space error to avoid large joint velocities near singularities
+    if (taskError.squaredNorm() > MAX_TASK_SPACE_VELOCITY * MAX_TASK_SPACE_VELOCITY)
+        taskError = taskError.normalized() * MAX_TASK_SPACE_VELOCITY;
+
+    // Compute joint space error using Jacobian damping
+    Eigen::JacobiSVD<Eigen::MatrixXd> svd(vJacobians[JOINT_COUNT - 1], Eigen::ComputeThinU | Eigen::ComputeThinV);
+    Eigen::MatrixXd damped_inverse = svd.matrixV() * (svd.singularValues().array() / (svd.singularValues().array().square() + JACOBIAN_DAMP_FACTOR * JACOBIAN_DAMP_FACTOR)).matrix().asDiagonal() * svd.matrixU().transpose();
+    Eigen::Vector<double, JOINT_COUNT> posJointError = damped_inverse * taskError;
 
     // Compute orientation error
     Eigen::Quaterniond currentRot(tProducts[JOINT_COUNT].topLeftCorner<3, 3>());
@@ -40,11 +51,8 @@ Eigen::Vector<double, JOINT_COUNT> Controller::update() {
     double angleError = angleAxisError.angle();
     Eigen::Vector3d axisError = angleAxisError.axis();
 
-    // Compute joint space error
-    jacobian::Jacobian eefVJacobian = vJacobians[JOINT_COUNT - 1];
-    jacobian::Jacobian eefOJacobian = oJacobians[JOINT_COUNT - 1];
-    Eigen::Vector<double, JOINT_COUNT> posJointError = eefVJacobian.transpose() * taskError;
-    Eigen::Vector<double, JOINT_COUNT> rotJointError = eefOJacobian.transpose() * (axisError * angleError);
+    // Compute rotational joint error
+    Eigen::Vector<double, JOINT_COUNT> rotJointError = oJacobians[JOINT_COUNT - 1].transpose() * (axisError * angleError);
     Eigen::Vector<double, JOINT_COUNT> totalJointError = posJointError + rotJointError;
 
     // Compute PID and APF torques

@@ -95,6 +95,9 @@ def get_args():
     # GPU Implementation
     parser.add_argument('--device', help='the pytorch device', type=str, default='cpu', choices=['cpu', 'cuda'])
 
+    # Video creation
+    parser.add_argument('--rollouts', help='the number of rollouts to capture', type=int, default=5)
+
     args = parser.parse_args()
     args.num_vertices = [args.n_x, args.n_y, args.n_z]
     args.goal_based = (args.env in Robotics_envs_id)

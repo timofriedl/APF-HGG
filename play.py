@@ -134,7 +134,7 @@ class Player:
             print('Collisions: ', env.collisions)
             print('Errors: ', err_sum)
 
-    def record_video(self, raw_path, test_rollouts=30):
+    def record_video(self, raw_path, test_rollouts):
         directory = os.path.dirname(raw_path)
         if not os.path.exists(directory):
             os.makedirs(directory)
@@ -185,4 +185,5 @@ if __name__ == "__main__":
     register_custom_envs()
     player = Player(args)
     # player.play()
-    player.record_video(raw_path="./videos/rollouts_{}_{}".format(args.env, args.play_policy), test_rollouts=5)
+    player.record_video(raw_path="./videos/rollouts_{}_{}".format(args.env, args.play_policy),
+                        test_rollouts=args.rollouts)
