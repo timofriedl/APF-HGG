@@ -84,6 +84,7 @@ class FrankaDirectFetchPick3DTarget(robot_env.RobotEnv, gym.utils.EzPickle):
         self.pid_integral = np.zeros(7, dtype=np.float64)
         self.pid_prev_error = np.zeros(7, dtype=np.float64)
         self.rl_goal_pos = np.zeros(3, dtype=np.float64)
+        self.rl_goal_rot = np.zeros(4, dtype=np.float64)
 
         super(FrankaDirectFetchPick3DTarget, self).__init__(
             model_path=model_path, n_substeps=n_substeps, n_actions=8,
@@ -176,6 +177,8 @@ class FrankaDirectFetchPick3DTarget(robot_env.RobotEnv, gym.utils.EzPickle):
         # Reset PID integral and error values
         self.pid_integral = np.zeros(7, np.float64)
         self.pid_prev_error = np.zeros(7, np.float64)
+        self.rl_goal_pos = np.zeros(3, np.float64)
+        self.rl_goal_rot = np.zeros(4, np.float64)
 
         # # Randomize start position of object if need.
         if self.has_object:
@@ -221,7 +224,7 @@ class FrankaDirectFetchPick3DTarget(robot_env.RobotEnv, gym.utils.EzPickle):
         sites_offset = (self.sim.data.site_xpos - self.sim.model.site_pos).copy()[6]
 
         # Move end effector into position.
-        theta = [-2.24, -0.038, 2.55, -2.68, 0., 0.984, 0.0327]
+        theta = [-2.049983, -1.19622719, 2.43909125, -1.18564799, 0.78263767, 2.11853267, 1.09898878]
         for i, angle in enumerate(theta):
             self.sim.data.set_joint_qpos("robot0_joint{}".format(i + 1), angle)
 

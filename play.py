@@ -40,16 +40,8 @@ class Player:
         env = self.env
         acc_sum, obs = 0.0, []
         err_sum = 0
-        # seed = 5995
-        # seed = 1240
-        # seed = 4014
-        # seed = 3019
-        seed = 1144
-        env.np_random.seed(seed)  # TODO remove
 
         for i in tqdm(range(self.test_rollouts)):
-            env.np_random.seed(seed + i)
-            print('Seed: ', seed + i)
             self.policy.reset()
             ob = env.reset()
             obs.append(goal_based_process(ob))
@@ -141,8 +133,6 @@ class Player:
 
         env = self.env
         test_col_tolerance = 0
-        seed = 3000
-        env.np_random.seed(seed)  # TODO remove
         # play policy on env
         recorder = VideoRecorder(env.env.env, base_path=raw_path)
         recorder.frames_per_sec = 30
@@ -150,7 +140,6 @@ class Player:
         tol_acc_sum = 0.0
         for i in range(test_rollouts):
             print("Rollout {} / {}".format(i + 1, test_rollouts))
-            env.np_random.seed(seed + i)
             self.policy.reset()
             ob = env.reset()
             env_info = None

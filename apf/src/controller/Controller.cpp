@@ -2,7 +2,6 @@
 #include "../transform/transform.h"
 #include "../transform/jacobian.h"
 #include "../apf/apf.h"
-#include <iostream>
 
 inline Eigen::Vector<double, JOINT_COUNT> Controller::computePidForces(const Eigen::Vector<double, JOINT_COUNT> &error) {
     integral += error * dt;
@@ -33,7 +32,6 @@ Eigen::Vector<double, JOINT_COUNT> Controller::update() {
     // Compute positional error
     Eigen::Vector3d currentEefPos = (tProducts[tProducts.size() - 1] * Eigen::Vector4d(0, 0, 0, 1)).head<3>();
     Eigen::Vector3d taskError = targetPos - currentEefPos;
-    std::cout << taskError.norm() << "\n";
 
     // Limit task space error to avoid large joint velocities near singularities
     if (taskError.squaredNorm() > MAX_TASK_SPACE_VELOCITY * MAX_TASK_SPACE_VELOCITY)

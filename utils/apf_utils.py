@@ -78,13 +78,16 @@ def get_capsules(env) -> np.ndarray:
 def apf_set_action(env, rl_action):
     # Extract goal position
     current_pos = env.sim.data.get_body_xpos('eef')
-    env.rl_goal_pos = current_pos + rl_action[:3]
+    env.rl_goal_pos[:] = current_pos[:3] + rl_action[:3]
     if env.block_z and env.rl_goal_pos[2] > env.block_max_z:
         env.rl_goal_pos[2] = env.block_max_z
 
     # Get target orientation
-    [qw, qx, qy, qz] = [0, 1, 0, 0] if env.block_orientation else rl_action[3:7]
-    rl_goal_rot = np.array([qx, qy, qz, qw], dtype=np.float64)
+    if env.block_orientation:
+        env.rl_goal_rot[:] = np.array([1, 0, 0, 0], dtype=np.float64)  # qw, qx, qy, qz
+    else:
+        env.rl_goal_rot[1:4] += 0.05 * rl_action[3:6]  # qx, qy, qz
+        env.rl_goal_rot[0] = math.sqrt(1.0 - np.sum(np.square(env.rl_goal_rot[1:4])))
 
     # Current joint configuration
     theta = get_theta(env.sim)
@@ -97,7 +100,7 @@ def apf_set_action(env, rl_action):
     # Compute joint torques
     env.rl_goal_pos -= env.robot_offset
     dt = env.sim.model.opt.timestep
-    torques = control_step(theta, env.rl_goal_pos, rl_goal_rot, obstacle_attributes, dt, env.pid_integral,
+    torques = control_step(theta, env.rl_goal_pos, env.rl_goal_rot, obstacle_attributes, dt, env.pid_integral,
                            env.pid_prev_error)
 
     # Normalize torques to [-1, 1]
