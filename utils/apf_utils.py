@@ -86,8 +86,13 @@ def apf_set_action(env, rl_action):
     if env.block_orientation:
         env.rl_goal_rot[:] = np.array([1, 0, 0, 0], dtype=np.float64)  # qw, qx, qy, qz
     else:
-        env.rl_goal_rot[1:4] += 0.05 * rl_action[3:6]  # qx, qy, qz
-        env.rl_goal_rot[0] = math.sqrt(1.0 - np.sum(np.square(env.rl_goal_rot[1:4])))
+        env.rl_goal_rot[1:4] += 0.05 * rl_action[3:6]  # qx, qy, qz, ignoring qw
+        sum_of_squares = np.sum(np.square(env.rl_goal_rot[1:4]))
+        if sum_of_squares > 1.0:
+            env.rl_goal_rot[1:4] /= np.sqrt(sum_of_squares)
+            sum_of_squares = 1.0
+
+        env.rl_goal_rot[0] = np.sqrt(1.0 - sum_of_squares)
 
     # Current joint configuration
     theta = get_theta(env.sim)
