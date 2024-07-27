@@ -11,6 +11,7 @@ class Controller {
     const Eigen::Vector<double, JOINT_COUNT> &theta;
     const Eigen::Vector3d &targetPos;
     const Eigen::Quaterniond &targetRot;
+    const double rotWeight;
     const std::vector<Capsule> &obstacles;
     Eigen::Vector<double, JOINT_COUNT> &integral;
     Eigen::Vector<double, JOINT_COUNT> &prevError;
@@ -20,12 +21,13 @@ class Controller {
 
 public:
     Controller(const Eigen::Vector<double, JOINT_COUNT> &theta,
-               const Eigen::Vector3d &targetPos, const Eigen::Quaterniond &targetRot,
+               const Eigen::Vector3d &targetPos, const Eigen::Quaterniond &targetRot, double rotWeight,
                const std::vector<Capsule> &obstacles, Eigen::Vector<double, JOINT_COUNT> &integral,
                Eigen::Vector<double, JOINT_COUNT> &prevError, double dt)
             : theta(theta),
               targetPos(targetPos),
               targetRot(targetRot),
+              rotWeight(rotWeight),
               obstacles(obstacles),
               integral(integral),
               prevError(prevError),

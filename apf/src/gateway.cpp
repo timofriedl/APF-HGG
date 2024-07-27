@@ -12,14 +12,15 @@ Capsule parseCapsule(const double *capsuleAttributes) {
 
 extern "C" {
 void step(const double jointAngles[JOINT_COUNT], const double targetPosValues[3], const double targetRotValues[4],
-          const double *obstacleAttributes, size_t obstacleCount, double dt,
+          double rotWeight, const double *obstacleAttributes, size_t obstacleCount, double dt,
           double integralValues[JOINT_COUNT], double prevErrorValues[JOINT_COUNT],
           double forceResult[JOINT_COUNT]) {
 
     // Extract objects
     const Eigen::Vector<double, JOINT_COUNT> theta(jointAngles);
     const Eigen::Vector3d targetPos(targetPosValues);
-    const Eigen::Quaterniond targetRot(targetRotValues);
+    Eigen::Quaterniond targetRot(targetRotValues);
+    targetRot.normalize();
     Eigen::Vector<double, JOINT_COUNT> integral(integralValues);
     Eigen::Vector<double, JOINT_COUNT> prevError(prevErrorValues);
 
@@ -31,7 +32,7 @@ void step(const double jointAngles[JOINT_COUNT], const double targetPosValues[3]
         obstacles.push_back(std::move(parseCapsule(obstacleAttributes + i * numPerCapsule)));
 
     // Create controller
-    Controller controller(theta, targetPos, targetRot, obstacles, integral, prevError, dt);
+    Controller controller(theta, targetPos, targetRot, rotWeight, obstacles, integral, prevError, dt);
 
     // Compute
     Eigen::Map<Eigen::Vector<double, JOINT_COUNT>>(forceResult).noalias() = controller.update();

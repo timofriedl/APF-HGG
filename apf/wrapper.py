@@ -11,6 +11,7 @@ lib.step.argtypes = [
     np.ctypeslib.ndpointer(dtype=np.float64, ndim=1),  # double theta[8]
     np.ctypeslib.ndpointer(dtype=np.float64, ndim=1),  # double targetPosValues[3]
     np.ctypeslib.ndpointer(dtype=np.float64, ndim=1),  # double targetRotValues[4]
+    ctypes.c_double,  # double rotWeight
     np.ctypeslib.ndpointer(dtype=np.float64, ndim=1),  # double *obstacleAttributes
     ctypes.c_size_t,  # size_t obstacleCount
     ctypes.c_double,  # double dt
@@ -20,7 +21,7 @@ lib.step.argtypes = [
 ]
 
 
-def control_step(theta: np.ndarray, target_pos_values: np.ndarray, target_rot_values: np.ndarray,
+def control_step(theta: np.ndarray, target_pos_values: np.ndarray, target_rot_values: np.ndarray, rot_weight,
                  obstacle_attributes: np.ndarray, dt, integral_values: np.ndarray, prev_error_values: np.ndarray):
     assert theta.shape[0] == JOINT_COUNT
     assert target_pos_values.shape == (3,)
@@ -35,7 +36,7 @@ def control_step(theta: np.ndarray, target_pos_values: np.ndarray, target_rot_va
         assert obstacle_attributes.shape[1] == 7
 
     force_result = np.zeros(JOINT_COUNT, dtype=np.float64)
-    lib.step(theta, target_pos_values, target_rot_values, obstacle_attributes.flatten(),
+    lib.step(theta, target_pos_values, target_rot_values, rot_weight, obstacle_attributes.flatten(),
              obstacle_attributes.shape[0], dt,
              integral_values, prev_error_values, force_result)
 
@@ -67,7 +68,7 @@ if __name__ == '__main__':
     obs_attr = np.array(attr, dtype=np.float64)
 
     start_time = time.time()
-    torques = control_step(theta_values, target_pos, target_rot, obs_attr, 0.001, integral, prev_error)
+    torques = control_step(theta_values, target_pos, target_rot, 1.0, obs_attr, 0.001, integral, prev_error)
     duration = time.time() - start_time
 
     np.set_printoptions(precision=2)

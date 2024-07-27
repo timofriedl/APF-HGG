@@ -45,15 +45,12 @@ Eigen::Vector<double, JOINT_COUNT> Controller::update() {
     // Compute orientation error
     Eigen::Quaterniond currentRot(tProducts[JOINT_COUNT].topLeftCorner<3, 3>());
     Eigen::Quaterniond rotError = targetRot * currentRot.conjugate();
+    rotError.normalize();
     Eigen::AngleAxisd angleAxisError(rotError);
-    double angleError = angleAxisError.angle();
-    Eigen::Vector3d axisError = angleAxisError.axis();
-
-    // Compute rotational joint error
-    Eigen::Vector<double, JOINT_COUNT> rotJointError = oJacobians[JOINT_COUNT - 1].transpose() * (axisError * angleError);
-    Eigen::Vector<double, JOINT_COUNT> totalJointError = posJointError + rotJointError;
+    Eigen::Vector<double, JOINT_COUNT> rotJointError = oJacobians[JOINT_COUNT - 1].transpose() * (angleAxisError.axis() * angleAxisError.angle());
 
     // Compute PID and APF torques
+    Eigen::Vector<double, JOINT_COUNT> totalJointError = posJointError + rotJointError * rotWeight;
     auto pidTorques = computePidForces(totalJointError);
     auto apfTorques = apf::computeTorques(tProducts, vJacobians, oJacobians, obstacles);
     return pidTorques + apfTorques;
