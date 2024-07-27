@@ -51,7 +51,7 @@ Eigen::Vector<double, JOINT_COUNT> Controller::update() {
 
     // Compute rotational joint error
     Eigen::Vector<double, JOINT_COUNT> rotJointError = oJacobians[JOINT_COUNT - 1].transpose() * (axisError * angleError);
-    Eigen::Vector<double, JOINT_COUNT> totalJointError = posJointError + rotJointError;
+    Eigen::Vector<double, JOINT_COUNT> totalJointError = posJointError; // TODO tf + rotJointError;
 
     // Compute PID and APF torques
     auto pidTorques = computePidForces(totalJointError);

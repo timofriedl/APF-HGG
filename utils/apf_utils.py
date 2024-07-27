@@ -35,8 +35,8 @@ def cuboid_to_capsule(pos: np.ndarray, rot: np.ndarray, size: np.ndarray) -> np.
         offset[indices[2]] = size[indices[2]] * 0.5  # Half the size in the largest dimension
         offset = rotations.quat_rot_vec(rot, offset)
 
-        capsule[:3] = pos - offset  # line from pos
-        capsule[3:6] = pos + offset  # line to pos
+        capsule[:3] = pos - offset  # line-from pos
+        capsule[3:6] = pos + offset  # line-to pos
         capsule[6] = 0.5 * math.sqrt(size[indices[0]] ** 2 + size[indices[1]] ** 2)  # capsule radius
 
     return capsule
@@ -76,9 +76,11 @@ def get_capsules(env) -> np.ndarray:
 
 
 def apf_set_action(env, rl_action):
+    rl_action = rl_action.copy()
+
     # Extract goal position
     current_pos = env.sim.data.get_body_xpos('eef')
-    env.rl_goal_pos[:] = current_pos[:3] + rl_action[:3]
+    env.rl_goal_pos[:] = env.goal + rl_action[:3]  # TODO tf current_pos[:3] + rl_action[:3]
     if env.block_z and env.rl_goal_pos[2] > env.block_max_z:
         env.rl_goal_pos[2] = env.block_max_z
 
@@ -86,7 +88,7 @@ def apf_set_action(env, rl_action):
     if env.block_orientation:
         env.rl_goal_rot[:] = np.array([1, 0, 0, 0], dtype=np.float64)  # qw, qx, qy, qz
     else:
-        env.rl_goal_rot[1:4] += 0.05 * rl_action[3:6]  # qx, qy, qz, ignoring qw
+        env.rl_goal_rot[1:4] += env.limit_action * rl_action[3:6]  # qx, qy, qz, ignoring qw
         sum_of_squares = np.sum(np.square(env.rl_goal_rot[1:4]))
         if sum_of_squares > 1.0:
             env.rl_goal_rot[1:4] /= np.sqrt(sum_of_squares)

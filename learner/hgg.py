@@ -156,9 +156,10 @@ class HGGLearner:
         self.sampler = MatchSampler(args, self.achieved_trajectory_pool)
 
     def learn(self, args, env, env_test, agent, buffer):
+        print("Resetting...")
         initial_goals = []
         desired_goals = []
-        for i in range(args.episodes):
+        for i in tqdm(range(args.episodes)):
             obs = self.env_List[i].reset()
             goal_a = obs['achieved_goal'].copy()
             goal_d = obs['desired_goal'].copy()
@@ -167,6 +168,7 @@ class HGGLearner:
 
         self.sampler.update(initial_goals, desired_goals)
 
+        print("Running episodes...")
         achieved_trajectories = []
         achieved_init_states = []
         for i in tqdm(range(args.episodes)):
@@ -199,5 +201,7 @@ class HGGLearner:
         for i in range(self.args.episodes):
             if goal_distance(achieved_trajectories[i][0], achieved_trajectories[i][-1]) > 0.01:
                 selection_trajectory_idx[i] = True
-        for idx in selection_trajectory_idx.keys():
+
+        print("Storing trajectories...")
+        for idx in tqdm(selection_trajectory_idx.keys()):
             self.achieved_trajectory_pool.insert(achieved_trajectories[idx].copy(), achieved_init_states[idx].copy())
