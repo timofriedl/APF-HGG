@@ -2,6 +2,7 @@
 #include "../transform/transform.h"
 #include "../transform/jacobian.h"
 #include "../apf/apf.h"
+#include <iostream>
 
 inline Eigen::Vector<double, JOINT_COUNT> Controller::computePidForces(const Eigen::Vector<double, JOINT_COUNT> &error) {
     integral += error * dt;

@@ -88,7 +88,14 @@ apf::computeTorque(const Capsule &linkCapsule, const Capsule &obstacle, const tr
     const jacobian::Jacobian poiJacobian = vJacobian + frameOffsetSkewMatrix * oJacobian;
 
     // Compute the joint-space force (torque), given the task-space force and the velocity jacobian
-    return poiJacobian.transpose() * forceVector;
+    Eigen::Vector<double, JOINT_COUNT> torque = poiJacobian.transpose() * forceVector;
+
+    // Replace NaN values
+    for (Eigen::Index i = 0; i < JOINT_COUNT; i++)
+        if (std::isnan(torque[i]))
+            torque[i] = 0.0;
+
+    return torque;
 }
 
 Eigen::Vector<double, JOINT_COUNT>

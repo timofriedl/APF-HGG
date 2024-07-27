@@ -6,8 +6,12 @@ import pickle5 as pickle
 from envs import register_custom_envs
 from tqdm import tqdm
 
+import tracemalloc
+
+
 
 def train():
+    tracemalloc.start()
     register_custom_envs()
     args = get_args()
     env, env_test, agent, buffer, learner, tester = experiment_setup(args)
@@ -37,6 +41,11 @@ def train():
     for epoch in range(args.epochs):
         for cycle in range(args.cycles):
             print("Epoch {} / {}, Cycle {} / {}".format(epoch + 1, args.epochs, cycle + 1, args.cycles))
+            snapshot = tracemalloc.take_snapshot()
+            top_stats = snapshot.statistics('lineno')
+            for stat in top_stats[:10]:
+                print(stat)
+
             args.logger.tabular_clear()
             args.logger.summary_clear()
             start_time = time.time()

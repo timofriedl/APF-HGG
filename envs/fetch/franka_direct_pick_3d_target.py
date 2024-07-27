@@ -1,4 +1,5 @@
 import os
+import time
 
 import gym
 import numpy as np
@@ -80,7 +81,8 @@ class FrankaDirectFetchPick3DTarget(robot_env.RobotEnv, gym.utils.EzPickle):
         self.obstacle_capsules = np.zeros([len(self.obstacles), 7], dtype=np.float64)
         self.block_orientation = False
         self.direct_action = np.zeros(9, dtype=np.float32)
-        self.robot_offset = np.array([0.8, 0.75, 0.44], dtype=np.float32)
+        self.robot_offset = np.array([0.8, 0.75, 0.44], dtype=np.float64)
+        self.pid_rot_weight = 0.0001
         self.pid_integral = np.zeros(7, dtype=np.float64)
         self.pid_prev_error = np.zeros(7, dtype=np.float64)
         self.rl_goal_pos = np.zeros(3, dtype=np.float64)

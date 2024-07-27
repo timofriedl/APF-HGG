@@ -12,7 +12,7 @@ constexpr double DERIVATIVE_EPSILON = 1E-5;
 
 // PID Controller
 constexpr double K_p = 10000.0;
-constexpr double K_i = 1.0;
+constexpr double K_i = 100.0;
 constexpr double K_d = 150.0;
 
 constexpr double MAX_TASK_SPACE_VELOCITY = 1.0;

@@ -40,9 +40,9 @@ def control_step(theta: np.ndarray, target_pos_values: np.ndarray, target_rot_va
              obstacle_attributes.shape[0], dt,
              integral_values, prev_error_values, force_result)
 
-    assert np.all(force_result != np.nan)
-    assert np.all(integral_values != np.nan)
-    assert np.all(prev_error_values != np.nan)
+    assert not np.any(np.isnan(force_result))
+    assert not np.any(np.isnan(integral_values))
+    assert not np.any(np.isnan(prev_error_values))
 
     return force_result
 
