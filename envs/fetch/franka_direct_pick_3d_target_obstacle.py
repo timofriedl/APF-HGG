@@ -19,7 +19,7 @@ def goal_distance(goal_a, goal_b):
 
 
 class FrankaDirectFetchPick3DTargetObstacle(robot_env.RobotEnv, gym.utils.EzPickle):
-    def __init__(self, reward_type='sparse', n_substeps=20):
+    def __init__(self, reward_type='sparse', n_substeps=1):
 
         """Initializes a new Fetch environment.
 
@@ -86,14 +86,17 @@ class FrankaDirectFetchPick3DTargetObstacle(robot_env.RobotEnv, gym.utils.EzPick
         self.geom_ids_obstacles = []
         self.flag = True
 
+        self.limit_action = 1.0  # limit maximum change in position
         self.dyn_obstacle_names = ('obstacle1',)
         self.obstacle_capsules = np.zeros([len(self.obstacles), 7], dtype=np.float64)
         self.block_orientation = False
         self.direct_action = np.zeros(9, dtype=np.float32)
         self.robot_offset = np.array([0.8, 0.75, 0.44], dtype=np.float32)
+        self.pid_rot_weight = 0.0001
         self.pid_integral = np.zeros(7, dtype=np.float64)
         self.pid_prev_error = np.zeros(7, dtype=np.float64)
         self.rl_goal_pos = np.zeros(3, dtype=np.float64)
+        self.rl_goal_rot = np.zeros(4, dtype=np.float64)
 
         super(FrankaDirectFetchPick3DTargetObstacle, self).__init__(
             model_path=model_path, n_substeps=n_substeps, n_actions=8,
@@ -284,6 +287,8 @@ class FrankaDirectFetchPick3DTargetObstacle(robot_env.RobotEnv, gym.utils.EzPick
         # Reset PID integral and error values
         self.pid_integral = np.zeros(7, np.float64)
         self.pid_prev_error = np.zeros(7, np.float64)
+        self.rl_goal_pos = np.zeros(3, np.float64)
+        self.rl_goal_rot = np.zeros(4, np.float64)
 
         # # Randomize start position of object if need.
         if self.has_object:

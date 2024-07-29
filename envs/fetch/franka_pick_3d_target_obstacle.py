@@ -314,13 +314,9 @@ class FrankaFetchPick3DTargetObstacle(robot_env.RobotEnv, gym.utils.EzPickle):
         n_obst = len(self.obstacles)
         n_dyn = self.n_moving_obstacles
         directions = self.np_random.choice([-1, 1], size=n_dyn)
-        directions[0] = 1  # TODO Just for reproduction purpose
 
         self.current_obstacle_shifts = self.np_random.uniform(-1.0, 1.0, size=n_obst)
         self.current_obstacle_vels = directions * self.np_random.uniform(self.vel_lims[0], self.vel_lims[1], size=n_dyn)
-
-        self.current_obstacle_shifts[0] = -0.33969071  # TODO Just for reproduction purpose
-        self.current_obstacle_vels[0] = 0.70848404  # TODO Just for reproduction purpose
 
         # print("Directions")
         # print(directions)
@@ -338,15 +334,6 @@ class FrankaFetchPick3DTargetObstacle(robot_env.RobotEnv, gym.utils.EzPickle):
         goal[0] += self.np_random.uniform(-self.target_range_x, self.target_range_x)
         goal[1] += self.np_random.uniform(-self.target_range_y, self.target_range_y)
         goal[2] += self.np_random.uniform(-self.target_range_z, self.target_range_z)
-        goal[0] = 1.2904798  # -self.target_range_x  # TODO For Reproduction Purpose
-        goal[1] = 0.25938475  # self.target_range_y  # TODO For Reproduction Purpose
-        goal[2] = 0.55374472  # self.target_range_z  # TODO For Reproduction Purpose
-
-        # goal[0] += self.target_range_x  # TODO For Reproduction Purpose
-        # goal[1] -= self.target_range_y  # TODO For Reproduction Purpose
-        # goal[2] -= self.target_range_z  # TODO For Reproduction Purpose
-        # print("Goal")
-        # print(goal)
 
         return goal.copy()
 
