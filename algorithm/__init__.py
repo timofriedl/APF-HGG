@@ -16,10 +16,12 @@ def create_agent(args):
         latest_file = None
         for file in files:
             if file.startswith("saved_policy-") and file.endswith(".index"):
-                epoch = int(file[len("saved_policy-"):file.find(".index")])
-                if epoch > max_epoch:
-                    max_epoch = epoch
-                    latest_file = file
+                epoch_str = file[len("saved_policy-"):file.find(".index")]
+                if epoch_str != "best":
+                    epoch = int(epoch_str)
+                    if epoch > max_epoch:
+                        max_epoch = epoch
+                        latest_file = file
 
         if latest_file is not None:
             load_path = os.path.join(load_dir, latest_file)
