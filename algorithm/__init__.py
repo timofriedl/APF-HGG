@@ -21,12 +21,12 @@ def create_agent(args):
                     epoch = int(epoch_str)
                     if epoch > max_epoch:
                         max_epoch = epoch
-                        latest_file = file
+                        latest_file = file[:len(file) - len(".index")]
 
         if latest_file is not None:
             load_path = os.path.join(load_dir, latest_file)
             agent.load(load_path)
-            print("Restored epoch {}".format(max_epoch))
+            print("Restored epoch {}.".format(max_epoch))
             args.start_epoch = max_epoch + 1
 
     return agent

@@ -32,7 +32,7 @@ class DDPG:
         def create_inputs():
             self.raw_obs_ph = tf.compat.v1.placeholder(tf.float32, [None] + self.args.obs_dims, name='raw_obs_ph')
             self.raw_obs_next_ph = tf.compat.v1.placeholder(tf.float32, [None] + self.args.obs_dims,
-                name='raw_obs_next_ph')
+                                                            name='raw_obs_next_ph')
             self.acts_ph = tf.compat.v1.placeholder(tf.float32, [None] + self.args.acts_dims, name='acts_ph')
             # self.rews_ph = tf.placeholder(tf.float32, [None, 1], name='rews_ph')
             self.rews_ph = tf.compat.v1.placeholder(tf.float32, [None, self.args.reward_dims], name='rews_ph')
@@ -46,8 +46,9 @@ class DDPG:
         def create_network():
             def mlp_policy(obs_ph):
                 with tf.compat.v1.variable_scope('net',
-                        initializer=tf.compat.v1.keras.initializers.VarianceScaling(scale=1.0, mode="fan_avg",
-                            distribution="uniform")):
+                                                 initializer=tf.compat.v1.keras.initializers.VarianceScaling(scale=1.0,
+                                                                                                             mode="fan_avg",
+                                                                                                             distribution="uniform")):
                     pi_dense1 = tf.compat.v1.layers.dense(obs_ph, 256, activation=tf.nn.relu, name='pi_dense1')
                     pi_dense2 = tf.compat.v1.layers.dense(pi_dense1, 256, activation=tf.nn.relu, name='pi_dense2')
                     pi_dense3 = tf.compat.v1.layers.dense(pi_dense2, 256, activation=tf.nn.relu, name='pi_dense3')
@@ -57,8 +58,9 @@ class DDPG:
             def mlp_value(obs_ph, acts_ph):
                 state_ph = tf.concat([obs_ph, acts_ph], axis=1)
                 with tf.compat.v1.variable_scope('net',
-                        initializer=tf.compat.v1.keras.initializers.VarianceScaling(scale=1.0, mode="fan_avg",
-                            distribution="uniform")):
+                                                 initializer=tf.compat.v1.keras.initializers.VarianceScaling(scale=1.0,
+                                                                                                             mode="fan_avg",
+                                                                                                             distribution="uniform")):
                     q_dense1 = tf.compat.v1.layers.dense(state_ph, 256, activation=tf.nn.relu, name='q_dense1')
                     q_dense2 = tf.compat.v1.layers.dense(q_dense1, 256, activation=tf.nn.relu, name='q_dense2')
                     q_dense3 = tf.compat.v1.layers.dense(q_dense2, 256, activation=tf.nn.relu, name='q_dense3')
@@ -84,7 +86,7 @@ class DDPG:
             self.pi_l2_loss = self.args.act_l2 * tf.reduce_mean(input_tensor=tf.square(self.pi))
             self.pi_optimizer = tf.compat.v1.train.AdamOptimizer(self.args.pi_lr)
             self.pi_train_op = self.pi_optimizer.minimize(self.pi_q_loss + self.pi_l2_loss,
-                var_list=get_vars('main/policy'))
+                                                          var_list=get_vars('main/policy'))
 
             if self.args.clip_return:
                 return_value = tf.clip_by_value(self.q_t, self.args.clip_return_l, self.args.clip_return_r)
@@ -184,5 +186,5 @@ class DDPG:
         self.saver.save(self.sess, filename, global_step=global_step)
 
     def load(self, filename):
-        with self.graph.as_default():
-            self.saver.restore(self.sess, filename)
+        self.saver = tf.compat.v1.train.import_meta_graph(f"{filename}.meta")
+        self.saver.restore(self.sess, filename)

@@ -81,7 +81,7 @@ class DDPG:
             self.pi_l2_loss = self.args.act_l2 * tf.reduce_mean(tf.square(self.pi))
             self.pi_optimizer = tf.train.AdamOptimizer(self.args.pi_lr)
             self.pi_train_op = self.pi_optimizer.minimize(self.pi_q_loss + self.pi_l2_loss,
-                var_list=get_vars('main/policy'))
+                                                          var_list=get_vars('main/policy'))
 
             if self.args.clip_return:
                 return_value = tf.clip_by_value(self.q_t, self.args.clip_return_l, self.args.clip_return_r)
@@ -179,8 +179,8 @@ class DDPG:
         self.saver.save(self.sess, filename, global_step=global_step)
 
     def load(self, filename):
-        with self.graph.as_default():
-            self.saver.restore(self.sess, filename)
+        self.saver = tf.compat.v1.train.import_meta_graph(f"{filename}.meta")
+        self.saver.restore(self.sess, filename)
 
     def get_q_pi(self, obs):
         feed_dict = {
