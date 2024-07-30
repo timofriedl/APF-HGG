@@ -12,7 +12,7 @@ def get_args():
     parser = get_arg_parser()
 
     parser.add_argument('--tag', help='terminal tag in logger', type=str, default='')
-    parser.add_argument('--alg', help='backend algorithm', type=str, default='ddpg', choices=['ddpg', 'ddpg2'])
+    parser.add_argument('--alg', help='backend algorithm', type=str, default='ddpg2', choices=['ddpg', 'ddpg2'])
     parser.add_argument('--learn', help='type of training method', type=str, default='hgg',
                         choices=learner_collection.keys())
 
@@ -31,7 +31,7 @@ def get_args():
     parser.add_argument('--gamma', help='discount factor', type=np.float32, default=0.98)
     parser.add_argument('--clip_return', help='whether to clip return value', type=str2bool, default=True)
     # these two arguments might be helpful if using other than sparse reward (-1, 0)
-    parser.add_argument('--reward_min', help='discount factor', type=np.float32, default=-1.)
+    parser.add_argument('--reward_min', help='discount factor', type=np.float32, default=-10.)
     parser.add_argument('--reward_max', help='discount factor', type=np.float32, default=0.)
     parser.add_argument('--eps_act', help='percentage of epsilon greedy explorarion', type=np.float32, default=0.3)
     parser.add_argument('--std_act', help='standard deviation of uncorrelated gaussian explorarion', type=np.float32,

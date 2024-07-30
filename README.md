@@ -12,12 +12,12 @@ You can find the C++ implementation of the APF PID controller in `./apf`.
 
 Train using
 ```bash
-python train2.py --alg ddpg2 --epochs 20 --env FrankaDirectFetchPickDynLiftedObstaclesEnv-v1 --reward_min -10 --goal apf --timesteps 100 --env_n_substeps 10
+python train2.py --epochs 20 --env FrankaDirectFetchPickDynLiftedObstaclesEnv-v1 --goal apf --timesteps 4000 --env_n_substeps 1
 ```
 
 Play video using
 ```bash
-python play.py --env FrankaDirectFetchPickDynLiftedObstaclesEnv-v1 --play_path log/ddpg2-FrankaDirectFetchPickDynLiftedObstaclesEnv-v1-hgg/ --play_epoch 19 --goal apf --play_policy APFPolicy --timesteps 1000 --env_n_substeps 10
+python play.py --env FrankaDirectFetchPickDynLiftedObstaclesEnv-v1 --play_path log/ddpg2-FrankaDirectFetchPickDynLiftedObstaclesEnv-v1-hgg/ --play_epoch 19 --goal apf --play_policy APFPolicy --timesteps 5000 --env_n_substeps 1
 ```
 
-Note that APF environments run at 1000Hz, while other environments are usually set to 500Hz. Therefore, `--env_n_substeps 10` corresponds to a RL policy frequency of 100Hz.
+Note that APF environments run at 1000Hz, while other environments are usually set to 500Hz. Therefore, `--timesteps 5000 --env_n_substeps 1` corresponds to 5000 * 1 / 1000Hz = 5s simulation time per rollout. Substeps must be 1 due to real time direct torque control.
