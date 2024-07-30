@@ -178,6 +178,10 @@ class DDPG:
     def save(self, filename, global_step=None):  # we just use the
         self.saver.save(self.sess, filename, global_step=global_step)
 
+    def load(self, filename):
+        with self.graph.as_default():
+            self.saver.restore(self.sess, filename)
+
     def get_q_pi(self, obs):
         feed_dict = {
             self.raw_obs_ph: obs

@@ -38,8 +38,9 @@ def train():
     args.logger.summary_setup()
     goal_list = None
 
-    for epoch in range(args.epochs):
+    for epoch_offset in range(args.epochs):
         for cycle in range(args.cycles):
+            epoch = args.start_epoch + epoch_offset
             print("Epoch {} / {}, Cycle {} / {}".format(epoch + 1, args.epochs, cycle + 1, args.cycles))
             snapshot = tracemalloc.take_snapshot()
             top_stats = snapshot.statistics('lineno')
