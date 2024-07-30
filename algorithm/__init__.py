@@ -15,8 +15,8 @@ def create_agent(args):
         max_epoch = -1
         latest_file = None
         for file in files:
-            if file.startswith("saved_policy-") and ".data" in file:
-                epoch = int(file[len("saved_policy-"):file.find(".data")])
+            if file.startswith("saved_policy-") and file.endswith(".index"):
+                epoch = int(file[len("saved_policy-"):file.find(".index")])
                 if epoch > max_epoch:
                     max_epoch = epoch
                     latest_file = file
