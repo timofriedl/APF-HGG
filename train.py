@@ -37,7 +37,7 @@ def train():
     for epoch_offset in range(args.epochs):
         for cycle in range(args.cycles):
             epoch = args.start_epoch + epoch_offset
-            print("Epoch {} / {}, Cycle {} / {}".format(epoch + 1, args.epochs + epoch_offset, cycle + 1, args.cycles))
+            print("Epoch {} / {}, Cycle {} / {}".format(epoch + 1, args.start_epoch + args.epochs, cycle + 1, args.cycles))
 
             args.logger.tabular_clear()
             args.logger.summary_clear()
