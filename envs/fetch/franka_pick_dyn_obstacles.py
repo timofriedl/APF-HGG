@@ -221,7 +221,6 @@ class FrankaFetchPickDynObstaclesEnv(robot_env.RobotEnv, gym.utils.EzPickle):
         dt = self.sim.nsubsteps * self.sim.model.opt.timestep
         grip_velp = self.sim.data.get_site_xvelp('grip_site') * dt
         robot_qpos, robot_qvel = utils.robot_get_obs(self.sim)
-        print("Robot Joints: " + str(robot_qpos))
         if self.has_object:
             object_pos = self.sim.data.get_site_xpos('object0')
             # rotations
