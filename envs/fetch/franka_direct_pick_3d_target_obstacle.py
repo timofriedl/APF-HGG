@@ -92,7 +92,7 @@ class FrankaDirectFetchPick3DTargetObstacle(robot_env.RobotEnv, gym.utils.EzPick
         self.block_orientation = False
         self.direct_action = np.zeros(9, dtype=np.float32)
         self.robot_offset = np.array([0.8, 0.75, 0.44], dtype=np.float32)
-        self.pid_rot_weight = 0.0001
+        self.pid_rot_weight = 0.001
         self.pid_integral = np.zeros(7, dtype=np.float64)
         self.pid_prev_error = np.zeros(7, dtype=np.float64)
         self.rl_goal_pos = np.zeros(3, dtype=np.float64)
@@ -152,7 +152,7 @@ class FrankaDirectFetchPick3DTargetObstacle(robot_env.RobotEnv, gym.utils.EzPick
 
         for i in range(self.n_moving_obstacles):
             max_q = self.pos_difs[i]
-            s_q = max_q * 16  # TODO tf
+            s_q = max_q * 8
             v = self.current_obstacle_vels[i]
             a = max_q  # amplitude
             p = s_q / v  # period
@@ -342,7 +342,7 @@ class FrankaDirectFetchPick3DTargetObstacle(robot_env.RobotEnv, gym.utils.EzPick
         sites_offset = (self.sim.data.site_xpos - self.sim.model.site_pos).copy()[6]
 
         # Move end effector into position.
-        theta = [-2.24, -0.038, 2.55, -2.68, 0., 0.984, 0.0327]
+        theta = [-2.049983, -1.19622719, 2.43909125, -1.18564799, 0.78263767, 2.11853267, 1.09898878]
         for i, angle in enumerate(theta):
             self.sim.data.set_joint_qpos("robot0_joint{}".format(i + 1), angle)
 
