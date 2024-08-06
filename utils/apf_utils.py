@@ -63,13 +63,14 @@ def setup_obstacle_capsules(env, obstacle_names):
 
 
 def get_capsules(env) -> np.ndarray:
-    for i in range(len(env.dyn_obstacles)):
+    dyn_obstacles = env.dyn_door_obstacles if env.dyn_door_obstacles is not None else env.dyn_obstacles
+    for i in range(len(dyn_obstacles)):
         body_id = env.sim.model.body_name2id(
             env.dyn_obstacle_names[i]
         )
         pos = env.sim.data.body_xpos[body_id]
         rot = env.sim.data.body_xquat[body_id]
-        size = env.dyn_obstacles[i][7:10]
+        size = dyn_obstacles[i][7:10]
         env.obstacle_capsules[i] = cuboid_to_capsule(pos, rot, size)
 
     return env.obstacle_capsules

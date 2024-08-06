@@ -73,14 +73,17 @@ class FrankaDirectFetchPickDynLiftedObstaclesEnv(robot_env.RobotEnv, gym.utils.E
         self.obstacles = self.dyn_obstacles + self.stat_obstacles
         self.obstacles_geom_names = self.dyn_obstacles_geom_names + self.stat_obstacles_geom_names
 
+        self.limit_action = 0.05  # limit maximum change in position
         self.dyn_obstacle_names = ('obstacle', 'obstacle2')
         self.obstacle_capsules = np.zeros([len(self.obstacles), 7], dtype=np.float64)
         self.block_orientation = True
         self.direct_action = np.zeros(9, dtype=np.float32)
-        self.robot_offset = np.array([0.8, 0.75, 0.44], dtype=np.float32)
+        self.robot_offset = np.array([0.8, 0.75, 0.44], dtype=np.float64)
+        self.pid_rot_weight = 0.01
         self.pid_integral = np.zeros(7, dtype=np.float64)
         self.pid_prev_error = np.zeros(7, dtype=np.float64)
         self.rl_goal_pos = np.zeros(3, dtype=np.float64)
+        self.rl_goal_rot = np.zeros(4, dtype=np.float64)
 
         super(FrankaDirectFetchPickDynLiftedObstaclesEnv, self).__init__(
             model_path=model_path, n_substeps=n_substeps, n_actions=8,
@@ -288,6 +291,8 @@ class FrankaDirectFetchPickDynLiftedObstaclesEnv(robot_env.RobotEnv, gym.utils.E
         # Reset PID integral and error values
         self.pid_integral = np.zeros(7, np.float64)
         self.pid_prev_error = np.zeros(7, np.float64)
+        self.rl_goal_pos = np.zeros(3, np.float64)
+        self.rl_goal_rot = np.zeros(4, np.float64)
 
         # Randomize start position of object.
         if self.has_object:
