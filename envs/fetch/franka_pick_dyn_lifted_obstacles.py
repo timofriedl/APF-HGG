@@ -329,27 +329,13 @@ class FrankaFetchPickDynLiftedObstaclesEnv(robot_env.RobotEnv, gym.utils.EzPickl
         n_dyn = self.n_moving_obstacles
         directions = self.np_random.choice([-1, 1], size=n_dyn)
 
-        # directions[0] = -1  # TODO Just for reproduction purpose
-        # directions[1] = 1  # TODO Just for reproduction purpose
-
         self.current_obstacle_shifts = self.np_random.uniform(-1.0, 1.0, size=n_obst)
         self.current_obstacle_vels[0] = directions[0] * self.np_random.uniform(self.vel_lims[0], self.vel_lims[1],
                                                                                size=1)
         # lower velocity for rectangle obstacle
         self.current_obstacle_vels[1] = directions[1] * self.np_random.uniform(self.vel_lims2[0], self.vel_lims2[1],
                                                                                size=1)
-        # self.current_obstacle_shifts[0] = 0.38997551  # TODO Just for reproduction purpose
-        # self.current_obstacle_shifts[1] = 0.54387205  # TODO Just for reproduction purpose
-        # self.current_obstacle_shifts[2] = 0.48796797  # TODO Just for reproduction purpose
-        # self.current_obstacle_vels[0] = -0.64831615  # TODO Just for reproduction purpose
-        # self.current_obstacle_vels[1] = 0.4220434  # TODO Just for reproduction purpose
 
-        # print("Directions")
-        # print(directions)
-        # print("Obstacle Shifts")
-        # print(self.current_obstacle_shifts)
-        # print("Obstacle Vels")
-        # print(self.current_obstacle_vels)
         self._move_obstacles(t=self.sim.get_state().time)  # move obstacles to the initial positions
 
         self.sim.forward()
@@ -357,13 +343,8 @@ class FrankaFetchPickDynLiftedObstaclesEnv(robot_env.RobotEnv, gym.utils.EzPickl
 
     def _sample_goal(self):
         goal = self.target_center.copy()
-
         goal[1] += self.np_random.uniform(-self.target_range_y, self.target_range_y)
         goal[0] += self.np_random.uniform(-self.target_range_x, self.target_range_x)
-        # goal[0] = 1.20032209  # TODO Just for reproduction purpose
-        # goal[1] = 0.48116506  # TODO Just for reproduction purpose
-        # print("Goal:")
-        # print(goal)
         return goal.copy()
 
     def _is_success(self, achieved_goal, desired_goal):
