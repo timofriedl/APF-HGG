@@ -15,8 +15,11 @@ from .fetch.pick_dyn_obstacles import FetchPickDynObstaclesEnv
 from .fetch.pick_dyn_obstacles2 import FetchPickDynObstaclesEnv2
 from .fetch.pick_dyn_obstacles_max import FetchPickDynObstaclesMaxEnv
 from .fetch.pick_dyn_sqr_obstacle import FetchPickDynSqrObstacleEnv
-from .fetch.franka_direct_pick_3d_target_obstacle import FrankaDirectFetchPick3DTargetObstacle
 from .fetch.franka_direct_pick_3d_target import FrankaDirectFetchPick3DTarget
+from .fetch.franka_direct_pick_3d_target_obstacle import FrankaDirectFetchPick3DTargetObstacle
+from .fetch.franka_direct_pick_dyn_obstacles import FrankaDirectFetchPickDynObstaclesEnv
+from .fetch.franka_direct_pick_dyn_lifted_obstacles import FrankaDirectFetchPickDynLiftedObstaclesEnv
+from .fetch.franka_direct_pick_dyn_door_obstacles import FrankaDirectFetchPickDynDoorObstaclesEnv
 
 
 def register_custom_envs():
@@ -117,20 +120,32 @@ def register_custom_envs():
         kwargs={'reward_type': 'sparse', 'n_substeps': 20},
     )
     gym.envs.register(
-        id='FrankaDirectFetchPickDynLiftedObstaclesEnv-v1',
-        entry_point='envs:FrankaDirectFetchPickDynLiftedObstaclesEnv',
-        max_episode_steps=1000,
+        id='FrankaDirectFetchPick3DTarget-v1',
+        entry_point='envs:FrankaDirectFetchPick3DTarget',
+        max_episode_steps=2000,
         kwargs={'reward_type': 'sparse', 'n_substeps': 1},
     )
     gym.envs.register(
         id='FrankaDirectFetchPick3DTargetObstacle-v1',
         entry_point='envs:FrankaDirectFetchPick3DTargetObstacle',
-        max_episode_steps=1000,
+        max_episode_steps=2000,
         kwargs={'reward_type': 'sparse', 'n_substeps': 1},
     )
     gym.envs.register(
-        id='FrankaDirectFetchPick3DTarget-v1',
-        entry_point='envs:FrankaDirectFetchPick3DTarget',
-        max_episode_steps=1000,
+        id='FrankaDirectFetchPickDynObstaclesEnv-v1',
+        entry_point='envs:FrankaDirectFetchPickDynObstaclesEnv',
+        max_episode_steps=2000,
+        kwargs={'reward_type': 'sparse', 'n_substeps': 1},
+    )
+    gym.envs.register(
+        id='FrankaDirectFetchPickDynLiftedObstaclesEnv-v1',
+        entry_point='envs:FrankaDirectFetchPickDynLiftedObstaclesEnv',
+        max_episode_steps=2000,
+        kwargs={'reward_type': 'sparse', 'n_substeps': 1},
+    )
+    gym.envs.register(
+        id='FrankaDirectFetchPickDynDoorObstaclesEnv-v1',
+        entry_point='envs:FrankaDirectFetchPickDynDoorObstaclesEnv',
+        max_episode_steps=2000,
         kwargs={'reward_type': 'sparse', 'n_substeps': 1},
     )
