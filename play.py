@@ -160,7 +160,6 @@ class Player:
             acc_sum += env_info['Success']
             if env.collisions <= test_col_tolerance:
                 tol_acc_sum += env_info['Success']
-            print("... done.")
             print('Collisions: ', env.collisions)
         print('Success rate: {}'.format(acc_sum / test_rollouts))
         print('Success rate (no col): {}'.format(tol_acc_sum / test_rollouts))

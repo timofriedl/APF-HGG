@@ -108,18 +108,22 @@ def get_parameters(args):
         return torch.cat((new_pos, new_vel), dim=1)
 
     def joint_collision_calculation(link_transform, link_verticies, obstacle_pos, obstacle_rot, obstacle_dim):
-
         transformed_link = link_transform.transform_points(link_verticies.to(torch.float64))
         transformed_link += robot_base_pos  # Translate Link into World Coordinates
 
         # Translate into Obstacle Coordinate System
         transformed_link_translated = transformed_link - obstacle_pos
 
-        obstacle_rot_quaternion = torch.roll(obstacle_rot, -1)
-        transform_obstacle = Transform3d().rotate(quaternion_to_matrix(obstacle_rot_quaternion)).to(
+        # Convert quaternion to rotation matrix
+        obstacle_rot_matrix = quaternion_to_matrix(obstacle_rot)
+
+        # Create a Transform3d object with the rotation matrix
+        transform_obstacle = Transform3d(matrix=obstacle_rot_matrix).to(
             device=args.device,
-            dtype=torch.float64)
-        # Calculate Transformed State to get the correct result
+            dtype=torch.float64
+        )
+
+        # Apply transformation
         transformed_points = transform_obstacle.transform_points(transformed_link_translated)
 
         closest_point = torch.clamp(transformed_points, min=-obstacle_dim, max=obstacle_dim)

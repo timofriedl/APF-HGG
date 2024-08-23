@@ -69,6 +69,7 @@ class FrankaDirectFetchPickDynObstaclesEnv(robot_env.RobotEnv, gym.utils.EzPickl
         self.stat_obstacles = []
         self.dyn_obstacles = [[1.3, 0.60, 0.435, 1.0, 0.0, 0.0, 0.0, 0.03, 0.03, 0.03],
                               [1.3, 0.80, 0.435, 1.0, 0.0, 0.0, 0.0, 0.12, 0.03, 0.03]]
+        self.dyn_door_obstacles = None
 
         self.obstacles = self.dyn_obstacles + self.stat_obstacles
         self.obstacles_geom_names = self.dyn_obstacles_geom_names + self.stat_obstacles_geom_names
@@ -80,7 +81,7 @@ class FrankaDirectFetchPickDynObstaclesEnv(robot_env.RobotEnv, gym.utils.EzPickl
         self.block_orientation = True
         self.direct_action = np.zeros(9, dtype=np.float32)
         self.robot_offset = np.array([0.8, 0.75, 0.44], dtype=np.float64)
-        self.pid_rot_weight = 0.01
+        self.pid_rot_weight = 0.1
         self.pid_integral = np.zeros(7, dtype=np.float64)
         self.pid_prev_error = np.zeros(7, dtype=np.float64)
         self.rl_goal_pos = np.zeros(3, dtype=np.float64)
@@ -153,7 +154,7 @@ class FrankaDirectFetchPickDynObstaclesEnv(robot_env.RobotEnv, gym.utils.EzPickl
 
         for i in range(self.n_moving_obstacles):
             max_q = self.pos_difs[i]
-            s_q = max_q * 4
+            s_q = max_q * 8
             v = self.current_obstacle_vels[i]
             a = max_q  # amplitude
             p = s_q / v  # period
@@ -356,16 +357,12 @@ class FrankaDirectFetchPickDynObstaclesEnv(robot_env.RobotEnv, gym.utils.EzPickl
         sites_offset = (self.sim.data.site_xpos - self.sim.model.site_pos).copy()[6]
 
         # Move end effector into position.
-        gripper_target = self.init_center + self.gripper_extra_height  # + self.sim.data.get_site_xpos('robot0:grip')
-        gripper_rotation = np.array([0, 1., 0., 0.])
-        self.sim.data.set_mocap_pos('panda0:mocap', gripper_target)
-        self.sim.data.set_mocap_quat('panda0:mocap', gripper_rotation)
+        theta = [-1.5531603498364208, -1.1783930647650682, 1.993011792106189, -2.045070748792923, 1.3757972477995606,
+                 2.107712606001714, 0.4674864089863272]
+        for i, angle in enumerate(theta):
+            self.sim.data.set_joint_qpos("robot0_joint{}".format(i + 1), angle)
 
-        pre_sub_steps = 200
-        pre_steps = int(pre_sub_steps / self.sim.nsubsteps)
-
-        for _ in range(pre_steps):
-            self.sim.step()
+        self.sim.step()
 
         # Extract information for sampling goals.
         self.initial_gripper_xpos = self.sim.data.get_site_xpos('grip_site').copy()

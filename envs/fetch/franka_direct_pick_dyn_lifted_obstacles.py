@@ -69,6 +69,7 @@ class FrankaDirectFetchPickDynLiftedObstaclesEnv(robot_env.RobotEnv, gym.utils.E
         self.stat_obstacles = [[1.3, 0.60, 0.435, 1.0, 0.0, 0.0, 0.0, 0.25, 0.03, 0.03]]
         self.dyn_obstacles = [[1.3, 0.60, 0.5, 1.0, 0.0, 0.0, 0.0, 0.03, 0.03, 0.03],
                               [1.3, 0.80, 0.465, 1.0, 0.0, 0.0, 0.0, 0.12, 0.03, 0.06]]
+        self.dyn_door_obstacles = None
 
         self.obstacles = self.dyn_obstacles + self.stat_obstacles
         self.obstacles_geom_names = self.dyn_obstacles_geom_names + self.stat_obstacles_geom_names
@@ -153,7 +154,7 @@ class FrankaDirectFetchPickDynLiftedObstaclesEnv(robot_env.RobotEnv, gym.utils.E
 
         for i in range(self.n_moving_obstacles):
             max_q = self.pos_difs[i]
-            s_q = max_q * 16  # TODO tf 4
+            s_q = max_q * 16  # TODO tf 8
             v = self.current_obstacle_vels[i]
             a = max_q  # amplitude
             p = s_q / v  # period

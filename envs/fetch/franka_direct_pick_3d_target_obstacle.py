@@ -71,6 +71,7 @@ class FrankaDirectFetchPick3DTargetObstacle(robot_env.RobotEnv, gym.utils.EzPick
 
         self.stat_obstacles = []
         self.dyn_obstacles = [[1.10, 0.50, 0.805, 1.0, 0.0, 0.0, 0.0, 0.03, 0.03, 0.30]]
+        self.dyn_door_obstacles = None
 
         self.obstacles = self.dyn_obstacles
 
@@ -92,7 +93,7 @@ class FrankaDirectFetchPick3DTargetObstacle(robot_env.RobotEnv, gym.utils.EzPick
         self.block_orientation = False
         self.direct_action = np.zeros(9, dtype=np.float32)
         self.robot_offset = np.array([0.8, 0.75, 0.44], dtype=np.float64)
-        self.pid_rot_weight = 0.001
+        self.pid_rot_weight = 0.1
         self.pid_integral = np.zeros(7, dtype=np.float64)
         self.pid_prev_error = np.zeros(7, dtype=np.float64)
         self.rl_goal_pos = np.zeros(3, dtype=np.float64)
@@ -299,6 +300,7 @@ class FrankaDirectFetchPick3DTargetObstacle(robot_env.RobotEnv, gym.utils.EzPick
             object_qpos = self.sim.data.get_joint_qpos('object0:joint')
             assert object_qpos.shape == (7,)
             object_qpos[:2] = object_xpos
+            object_qpos[2] += 0.02
             self.sim.data.set_joint_qpos('object0:joint', object_qpos)
 
         if self.block_object_in_gripper:

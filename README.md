@@ -10,11 +10,6 @@ You can find the C++ implementation of the APF PID controller in `./apf`.
 
 ## Usage
 
-Train using
-```bash
-python train2.py --epochs 20 --env FrankaDirectFetchPickDynLiftedObstaclesEnv-v1 --goal apf --timesteps 4000 --env_n_substeps 1
-```
-
 Play video using
 ```bash
 python play.py --env FrankaDirectFetchPickDynLiftedObstaclesEnv-v1 --play_path log/ddpg2-FrankaDirectFetchPickDynLiftedObstaclesEnv-v1-hgg/ --play_epoch 19 --goal apf --play_policy APFPolicy --timesteps 5000 --env_n_substeps 1

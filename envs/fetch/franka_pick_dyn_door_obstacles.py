@@ -62,7 +62,7 @@ class FrankaFetchPickDynDoorObstaclesEnv(robot_env.RobotEnv, gym.utils.EzPickle)
         self.distance_threshold = 0.05
         self.reward_type = reward_type
         self.limit_action = 0.05  # limit maximum change in position
-        self.block_max_z = 0.43  # 0.50  # 0.53 - 0.02 - 0.02
+        self.block_max_z = 0.51  # 0.50  # 0.53 - 0.02 - 0.02
 
         self.field = [1.3, 0.75, 0.6, 0.25, 0.35, 0.2]
         self.dyn_obstacles_geom_names = ['obstacle:geom']
@@ -426,6 +426,8 @@ class FrankaFetchPickDynDoorObstaclesEnv(robot_env.RobotEnv, gym.utils.EzPickle)
 
         for _ in range(pre_steps):
             self.sim.step()
+
+
 
         # Extract information for sampling goals.
         self.initial_gripper_xpos = self.sim.data.get_site_xpos('grip_site').copy()

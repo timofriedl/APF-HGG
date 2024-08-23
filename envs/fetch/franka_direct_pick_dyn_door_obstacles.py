@@ -403,16 +403,11 @@ class FrankaDirectFetchPickDynDoorObstaclesEnv(robot_env.RobotEnv, gym.utils.EzP
         sites_offset = (self.sim.data.site_xpos - self.sim.model.site_pos).copy()[6]
 
         # Move end effector into position.
-        gripper_target = self.init_center + self.gripper_extra_height  # + self.sim.data.get_site_xpos('robot0:grip')
-        gripper_rotation = np.array([0, 1., 0., 0.])
-        self.sim.data.set_mocap_pos('panda0:mocap', gripper_target)
-        self.sim.data.set_mocap_quat('panda0:mocap', gripper_rotation)
+        theta = [-1.55316035, -1.17839306, 1.99301179, -2.04507075, 1.37579725, 2.10771261, 0.46748641]
+        for i, angle in enumerate(theta):
+            self.sim.data.set_joint_qpos("robot0_joint{}".format(i + 1), angle)
 
-        pre_sub_steps = 200
-        pre_steps = int(pre_sub_steps / self.sim.nsubsteps)
-
-        for _ in range(pre_steps):
-            self.sim.step()
+        self.sim.step()
 
         # Extract information for sampling goals.
         self.initial_gripper_xpos = self.sim.data.get_site_xpos('grip_site').copy()

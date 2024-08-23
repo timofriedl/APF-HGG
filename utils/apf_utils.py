@@ -82,7 +82,7 @@ def apf_set_action(env, rl_action):
     # Extract goal position
     current_pos = env.sim.data.get_body_xpos('eef')
     env.rl_goal_pos[:] = current_pos[:3] + env.limit_action * rl_action[:3]
-    if env.block_z and env.rl_goal_pos[2] > env.block_max_z:
+    if env.block_z:
         env.rl_goal_pos[2] = env.block_max_z
 
     # Get target orientation
