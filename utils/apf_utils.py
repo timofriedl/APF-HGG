@@ -5,7 +5,9 @@ from gym_robotics.envs import rotations
 
 from apf.wrapper import control_step
 
+SQRT_2_HALF = 0.5 * math.sqrt(2.0)
 SQRT_3_HALF = 0.5 * math.sqrt(3.0)
+SKIP_RL = False
 
 
 def direct_set_action(sim, action: np.ndarray) -> None:
@@ -81,8 +83,8 @@ def apf_set_action(env, rl_action):
 
     # Extract goal position
     current_pos = env.sim.data.get_body_xpos('eef')
-    env.rl_goal_pos[:] = current_pos[:3] + env.limit_action * rl_action[:3]
-    if env.block_z:
+    env.rl_goal_pos[:] = env.goal[:3] + np.array([0, 0, 0.05], dtype=np.float64) if SKIP_RL else current_pos[:3] + env.limit_action * rl_action[:3]
+    if env.block_z and env.rl_goal_pos[2] > env.block_max_z:
         env.rl_goal_pos[2] = env.block_max_z
 
     # Get target orientation
@@ -109,7 +111,7 @@ def apf_set_action(env, rl_action):
     env.direct_action[:7] = torques / env.sim.model.actuator_forcerange[:7, 1]
 
     # Directly use RL gripper action
-    gripper_ctrl = -0.8 if env.block_gripper else rl_action[7]
+    gripper_ctrl = -0.8 if SKIP_RL or env.block_gripper else rl_action[7]
     env.direct_action[7] = gripper_ctrl
     env.direct_action[8] = gripper_ctrl
 

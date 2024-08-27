@@ -83,7 +83,7 @@ class FrankaDirectFetchPickDynDoorObstaclesEnv(robot_env.RobotEnv, gym.utils.EzP
         self.block_orientation = True
         self.direct_action = np.zeros(9, dtype=np.float32)
         self.robot_offset = np.array([0.8, 0.75, 0.44], dtype=np.float64)
-        self.pid_rot_weight = 0.01
+        self.pid_rot_weight = 5.0
         self.pid_integral = np.zeros(7, dtype=np.float64)
         self.pid_prev_error = np.zeros(7, dtype=np.float64)
         self.rl_goal_pos = np.zeros(3, dtype=np.float64)
@@ -187,7 +187,7 @@ class FrankaDirectFetchPickDynDoorObstaclesEnv(robot_env.RobotEnv, gym.utils.EzP
 
         for i in range(self.n_moving_obstacles):
             max_q = self.pos_difs[i]
-            s_q = max_q * 4
+            s_q = max_q * 16
             v = self.current_obstacle_vels[i]
             a = max_q  # amplitude
             p = s_q / v  # period
