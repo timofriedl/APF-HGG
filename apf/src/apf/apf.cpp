@@ -114,7 +114,7 @@ apf::computeTorques(const transform::TMatrices &tProducts, const jacobian::Jacob
         // Self-collision
         for (auto &[j, otherLinkCapsule]: robotCapsules)
             if (j < i - 2 || j > i + 2) // Don't check self-collision with closely neighbored links
-                ; // TODO torques += apf::computeTorque(linkCapsule, otherLinkCapsule, tProductsInv[i], vJacobians[i], oJacobians[i]);
+                torques += apf::computeTorque(linkCapsule, otherLinkCapsule, tProductsInv[i], vJacobians[i], oJacobians[i]);
     }
 
     return torques;
