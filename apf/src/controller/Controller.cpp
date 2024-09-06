@@ -57,6 +57,11 @@ Eigen::Vector<double, JOINT_COUNT> Controller::update() {
     // Apply the weighting matrix to the task-space error
     Eigen::Matrix<double, 6, 1> weightedTaskError = weightingMatrix * taskError;
 
+    // Create a full jacobian
+    Eigen::Matrix<double, 6, JOINT_COUNT> fullJacobian;
+    fullJacobian.topRows(3) = vJacobians[JOINT_COUNT - 1];
+    fullJacobian.bottomRows(3) = oJacobians[JOINT_COUNT - 1];
+
     // Compute the damped pseudo-inverse of the Jacobian for task-space to joint-space projection
     Eigen::JacobiSVD<Eigen::MatrixXd> svd(vJacobians[JOINT_COUNT - 1], Eigen::ComputeThinU | Eigen::ComputeThinV);
     Eigen::MatrixXd dampedInverse = svd.matrixV() * (svd.singularValues().array() /
