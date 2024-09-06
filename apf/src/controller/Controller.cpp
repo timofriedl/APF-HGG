@@ -52,8 +52,7 @@ Eigen::Vector<double, JOINT_COUNT> Controller::update() {
 
     // Create a task-space weighting matrix to balance position and orientation
     Eigen::Matrix<double, 6, 6> weightingMatrix = Eigen::Matrix<double, 6, 6>::Identity();
-    weightingMatrix.block<3, 3>(0, 0) *= positionWeight;  // Scale positional error
-    weightingMatrix.block<3, 3>(3, 3) *= rotationWeight;  // Scale orientation error
+    weightingMatrix.block<3, 3>(3, 3) *= rotWeight;  // Scale orientation error
 
     // Apply the weighting matrix to the task-space error
     Eigen::Matrix<double, 6, 1> weightedTaskError = weightingMatrix * taskError;
