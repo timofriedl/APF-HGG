@@ -43,7 +43,7 @@ Eigen::Vector<double, JOINT_COUNT> Controller::update() {
     Eigen::Quaterniond rotError = targetRot * currentRot.conjugate();
     rotError.normalize();
     Eigen::AngleAxisd angleAxisError(rotError);
-    Eigen::Vector3d taskErrorRot = angleAxisError.axis() * angleAxisError.angle();
+    Eigen::Vector3d taskErrorRot = angleAxisError.axis() * (angleAxisError.angle() + rotWeight);
 
     // Combine position and orientation errors into a single task-space error vector (6D)
     Eigen::Matrix<double, 6, 1> taskError;
