@@ -64,7 +64,7 @@ Eigen::Vector<double, JOINT_COUNT> Controller::update() {
 
     // Compute the damped pseudo-inverse of the Jacobian for task-space to joint-space projection
     Eigen::JacobiSVD<Eigen::MatrixXd> svd(vJacobians[JOINT_COUNT - 1], Eigen::ComputeThinU | Eigen::ComputeThinV);
-    Eigen::MatrixXd dampedInverse = svd.matrixV() * (svd.singularValues().array() /
+    Eigen::Matrix<double, JOINT_COUNT, 6> dampedInverse = svd.matrixV() * (svd.singularValues().array() /
                         (svd.singularValues().array().square() + JACOBIAN_DAMP_FACTOR * JACOBIAN_DAMP_FACTOR))
                         .matrix().asDiagonal() * svd.matrixU().transpose();
 
