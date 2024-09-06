@@ -26,33 +26,53 @@ Eigen::Vector<double, JOINT_COUNT> Controller::update() {
     assert(tMatrices.size() == JOINT_COUNT + 1);
     assert(tProducts.size() == JOINT_COUNT + 1);
 
-    // Compute jacobians
+    // Compute Jacobians
     jacobian::Jacobians vJacobians = jacobian::velocityJacobians(theta, tMatrices, tProducts);
     jacobian::Jacobians oJacobians = jacobian::orientationJacobians(tProducts);
 
     // Compute positional error
     Eigen::Vector3d currentEefPos = (tProducts[tProducts.size() - 1] * Eigen::Vector4d(0, 0, 0, 1)).head<3>();
-    Eigen::Vector3d taskError = targetPos - currentEefPos;
+    Eigen::Vector3d taskErrorPos = targetPos - currentEefPos;
 
     // Limit task space error to avoid large joint velocities near singularities
-    if (taskError.squaredNorm() > MAX_TASK_SPACE_VELOCITY * MAX_TASK_SPACE_VELOCITY)
-        taskError = taskError.normalized() * MAX_TASK_SPACE_VELOCITY;
-
-    // Compute joint space error using Jacobian damping
-    Eigen::JacobiSVD<Eigen::MatrixXd> svd(vJacobians[JOINT_COUNT - 1], Eigen::ComputeThinU | Eigen::ComputeThinV);
-    Eigen::MatrixXd damped_inverse = svd.matrixV() * (svd.singularValues().array() / (svd.singularValues().array().square() + JACOBIAN_DAMP_FACTOR * JACOBIAN_DAMP_FACTOR)).matrix().asDiagonal() * svd.matrixU().transpose();
-    Eigen::Vector<double, JOINT_COUNT> posJointError = damped_inverse * taskError;
+    if (taskErrorPos.squaredNorm() > MAX_TASK_SPACE_VELOCITY * MAX_TASK_SPACE_VELOCITY)
+        taskErrorPos = taskErrorPos.normalized() * MAX_TASK_SPACE_VELOCITY;
 
     // Compute orientation error
     Eigen::Quaterniond currentRot(tProducts[JOINT_COUNT].topLeftCorner<3, 3>());
     Eigen::Quaterniond rotError = targetRot * currentRot.conjugate();
     rotError.normalize();
     Eigen::AngleAxisd angleAxisError(rotError);
-    Eigen::Vector<double, JOINT_COUNT> rotJointError = oJacobians[JOINT_COUNT - 1].transpose() * (angleAxisError.axis() * angleAxisError.angle());
+    Eigen::Vector3d taskErrorRot = angleAxisError.axis() * angleAxisError.angle();
 
-    // Compute PID and APF torques
-    Eigen::Vector<double, JOINT_COUNT> totalJointError = posJointError + rotJointError * rotWeight;
-    auto pidTorques = computePidForces(totalJointError);
+    // Combine position and orientation errors into a single task-space error vector (6D)
+    Eigen::Matrix<double, 6, 1> taskError;
+    taskError.head<3>() = taskErrorPos; // Positional error (first 3 elements)
+    taskError.tail<3>() = taskErrorRot; // Orientation error (last 3 elements)
+
+    // Create a task-space weighting matrix to balance position and orientation
+    Eigen::Matrix<double, 6, 6> weightingMatrix = Eigen::Matrix<double, 6, 6>::Identity();
+    weightingMatrix.block<3, 3>(0, 0) *= positionWeight;  // Scale positional error
+    weightingMatrix.block<3, 3>(3, 3) *= rotationWeight;  // Scale orientation error
+
+    // Apply the weighting matrix to the task-space error
+    Eigen::Matrix<double, 6, 1> weightedTaskError = weightingMatrix * taskError;
+
+    // Compute the damped pseudo-inverse of the Jacobian for task-space to joint-space projection
+    Eigen::JacobiSVD<Eigen::MatrixXd> svd(vJacobians[JOINT_COUNT - 1], Eigen::ComputeThinU | Eigen::ComputeThinV);
+    Eigen::MatrixXd dampedInverse = svd.matrixV() * (svd.singularValues().array() /
+                        (svd.singularValues().array().square() + JACOBIAN_DAMP_FACTOR * JACOBIAN_DAMP_FACTOR))
+                        .matrix().asDiagonal() * svd.matrixU().transpose();
+
+    // Map weighted task-space error into joint-space
+    Eigen::Vector<double, JOINT_COUNT> jointError = dampedInverse * weightedTaskError;
+
+    // Compute PID torques based on the joint-space error
+    auto pidTorques = computePidForces(jointError);
+
+    // Compute APF (Artificial Potential Field) torques for obstacle avoidance
     auto apfTorques = apf::computeTorques(tProducts, vJacobians, oJacobians, obstacles);
+
+    // Combine the computed torques
     return pidTorques + apfTorques;
 }
