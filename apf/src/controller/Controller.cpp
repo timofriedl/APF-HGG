@@ -34,26 +34,12 @@ Eigen::Vector<double, JOINT_COUNT> Controller::update() {
     Eigen::Vector3d currentEefPos = (tProducts[tProducts.size() - 1] * Eigen::Vector4d(0, 0, 0, 1)).head<3>();
     Eigen::Vector3d taskErrorPos = targetPos - currentEefPos;
 
-    // Limit task space error to avoid large joint velocities near singularities
-    if (taskErrorPos.squaredNorm() > MAX_TASK_SPACE_VELOCITY * MAX_TASK_SPACE_VELOCITY)
-        taskErrorPos = taskErrorPos.normalized() * MAX_TASK_SPACE_VELOCITY;
-
     // Compute orientation error
     Eigen::Quaterniond currentRot(tProducts[JOINT_COUNT].topLeftCorner<3, 3>());
     Eigen::Quaterniond rotError = targetRot * currentRot.conjugate();
     rotError.normalize();
     Eigen::AngleAxisd angleAxisError(rotError);
-    Eigen::Vector3d taskErrorRot = angleAxisError.axis() * (angleAxisError.angle() + rotWeight);
-
-    // Combine position and orientation errors into a single task-space error vector (6D)
-    Eigen::Matrix<double, 6, 1> taskError;
-    taskError.head<3>() = taskErrorPos;  // Positional error (first 3 elements)
-    taskError.tail<3>() = taskErrorRot;  // Orientation error (last 3 elements)
-
-    // Create a full jacobian
-    Eigen::Matrix<double, 6, JOINT_COUNT> fullJacobian;
-    fullJacobian.topRows(3) = vJacobians[JOINT_COUNT - 1];
-    fullJacobian.bottomRows(3) = oJacobians[JOINT_COUNT - 1];
+    Eigen::Vector3d taskErrorRot = angleAxisError.axis() * (angleAxisError.angle() * rotWeight);
 
     // Compute the pseudo-inverse of the orientation Jacobian
     Eigen::JacobiSVD<Eigen::MatrixXd> svdOrient(oJacobians[JOINT_COUNT - 1], Eigen::ComputeThinU | Eigen::ComputeThinV);
@@ -62,32 +48,28 @@ Eigen::Vector<double, JOINT_COUNT> Controller::update() {
          (svdOrient.singularValues().array().square() + JACOBIAN_DAMP_FACTOR * JACOBIAN_DAMP_FACTOR))
         .matrix().asDiagonal() * svdOrient.matrixU().transpose();
 
+    // Joint-space correction for orientation task
+    Eigen::Vector<double, JOINT_COUNT> jointErrorOrient = orientPseudoInverse * taskErrorRot;
+
     // Compute the null space projection matrix for the orientation task
     Eigen::Matrix<double, JOINT_COUNT, JOINT_COUNT> nullSpaceProjection =
         Eigen::Matrix<double, JOINT_COUNT, JOINT_COUNT>::Identity() - orientPseudoInverse * oJacobians[JOINT_COUNT - 1];
 
-    // Compute the joint-space error for orientation
-    Eigen::Vector<double, JOINT_COUNT> jointErrorOrient = orientPseudoInverse * taskErrorRot;
-
-    // Compute the joint-space error for position projected into the null space of the orientation task
+    // Compute the pseudo-inverse of the velocity Jacobian for positional control
     Eigen::JacobiSVD<Eigen::MatrixXd> svdPos(vJacobians[JOINT_COUNT - 1], Eigen::ComputeThinU | Eigen::ComputeThinV);
     Eigen::Matrix<double, JOINT_COUNT, 3> posPseudoInverse = svdPos.matrixV() *
         (svdPos.singularValues().array() /
          (svdPos.singularValues().array().square() + JACOBIAN_DAMP_FACTOR * JACOBIAN_DAMP_FACTOR))
         .matrix().asDiagonal() * svdPos.matrixU().transpose();
 
-    // Apply null space projection to the positional task
+    // Apply null space projection to positional correction
     Eigen::Vector<double, JOINT_COUNT> jointErrorPos = nullSpaceProjection * (posPseudoInverse * taskErrorPos);
 
-    // Combine orientation and position errors
+    // Combine orientation and strictly null-space positional errors
     Eigen::Vector<double, JOINT_COUNT> totalJointError = jointErrorOrient + jointErrorPos;
 
-    // Compute PID torques based on the combined joint-space error
+    // Compute torques
     auto pidTorques = computePidForces(totalJointError);
-
-    // Compute APF (Artificial Potential Field) torques for obstacle avoidance
     auto apfTorques = apf::computeTorques(tProducts, vJacobians, oJacobians, obstacles);
-
-    // Combine the computed torques
     return pidTorques + apfTorques;
 }

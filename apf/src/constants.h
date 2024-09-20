@@ -15,16 +15,16 @@ constexpr double K_p = 10000.0;
 constexpr double K_i = 1.0;
 constexpr double K_d = 150.0;
 
-constexpr double MAX_TASK_SPACE_VELOCITY = 1.0;
+constexpr double MAX_TASK_SPACE_VELOCITY = 2.0;
 constexpr double JACOBIAN_DAMP_FACTOR = 0.4;
 
 constexpr std::array<double, JOINT_COUNT> PID_MIN_FORCE{-87.0, -87.0, -87.0, -87.0, -12.0, -12.0, -12.0};
 constexpr std::array<double, JOINT_COUNT> PID_MAX_FORCE{87.0, 87.0, 87.0, 87.0, 12.0, 12.0, 12.0};
 
 // APF
-constexpr double APF_FORCE_FACTOR = 0.1;
+constexpr double APF_FORCE_FACTOR = 0.3;
 constexpr double APF_MAX_FORCE = 1.0E8;
 constexpr double CUTOFF_RADIUS = 0.25;
-constexpr double APF_MARGIN = 0.05;
+constexpr double APF_MARGIN = 0.10;
 
 #endif //APF_HGG_CORE_CONSTANTS_H

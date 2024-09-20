@@ -50,7 +50,7 @@ class FrankaDirectFetchPickDynDoorObstaclesEnv(robot_env.RobotEnv, gym.utils.EzP
         model_path = MODEL_XML_PATH
         self.further = False
         self.gripper_extra_height = [0, 0, 0.035]
-        self.block_gripper = False
+        self.block_gripper = True
         self.has_object = True
         self.block_object_in_gripper = True
         self.block_z = True
@@ -60,10 +60,10 @@ class FrankaDirectFetchPickDynDoorObstaclesEnv(robot_env.RobotEnv, gym.utils.EzP
         self.target_range = 0.05  # min target range for both axis
         self.target_range_x = 0.2  # entire table: 0.125
         self.target_range_y = 0.02  # entire table: 0.175
-        self.distance_threshold = 0.05
+        self.distance_threshold = 0.1
         self.reward_type = reward_type
         self.limit_action = 0.05  # limit maximum change in position
-        self.block_max_z = 0.43  # 0.50  # 0.53 - 0.02 - 0.02
+        self.block_max_z = 0.48
 
         self.field = [1.3, 0.75, 0.6, 0.25, 0.35, 0.2]
         self.dyn_obstacles_geom_names = ['obstacle:geom']
@@ -83,7 +83,7 @@ class FrankaDirectFetchPickDynDoorObstaclesEnv(robot_env.RobotEnv, gym.utils.EzP
         self.block_orientation = True
         self.direct_action = np.zeros(9, dtype=np.float32)
         self.robot_offset = np.array([0.8, 0.75, 0.44], dtype=np.float64)
-        self.pid_rot_weight = 5.0
+        self.pid_rot_weight = 2
         self.pid_integral = np.zeros(7, dtype=np.float64)
         self.pid_prev_error = np.zeros(7, dtype=np.float64)
         self.rl_goal_pos = np.zeros(3, dtype=np.float64)
@@ -187,7 +187,7 @@ class FrankaDirectFetchPickDynDoorObstaclesEnv(robot_env.RobotEnv, gym.utils.EzP
 
         for i in range(self.n_moving_obstacles):
             max_q = self.pos_difs[i]
-            s_q = max_q * 16
+            s_q = max_q * 4
             v = self.current_obstacle_vels[i]
             a = max_q  # amplitude
             p = s_q / v  # period

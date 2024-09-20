@@ -63,7 +63,7 @@ class FrankaDirectFetchPick3DTargetObstacle(robot_env.RobotEnv, gym.utils.EzPick
         self.target_range_x = 0.15  # entire table: 0.125
         self.target_range_y = 0.02  # entire table: 0.175
         self.target_range_z = 0.2  # entire table: 0.175
-        self.distance_threshold = 0.05
+        self.distance_threshold = 0.10
         self.reward_type = reward_type
         self.block_max_z = 0.53
 
@@ -87,13 +87,13 @@ class FrankaDirectFetchPick3DTargetObstacle(robot_env.RobotEnv, gym.utils.EzPick
         self.geom_ids_obstacles = []
         self.flag = True
 
-        self.limit_action = 1.0  # limit maximum change in position
+        self.limit_action = 0.05  # limit maximum change in position
         self.dyn_obstacle_names = ('obstacle1',)
         self.obstacle_capsules = np.zeros([len(self.obstacles), 7], dtype=np.float64)
         self.block_orientation = False
         self.direct_action = np.zeros(9, dtype=np.float32)
         self.robot_offset = np.array([0.8, 0.75, 0.44], dtype=np.float64)
-        self.pid_rot_weight = 0.1
+        self.pid_rot_weight = 1.0
         self.pid_integral = np.zeros(7, dtype=np.float64)
         self.pid_prev_error = np.zeros(7, dtype=np.float64)
         self.rl_goal_pos = np.zeros(3, dtype=np.float64)
