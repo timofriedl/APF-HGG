@@ -39,6 +39,12 @@ sudo ln -s /opt/cmake/bin/* /usr/local/bin/
 sudo apt-get install g++
 export CXX=/usr/bin/g++
 
+- pip install -r requirements.txt
+
+- ./apf/build.sh
+
+- Install Mujoco (see Patrick Hinner's repository)
+
 ## Usage
 
 Play video using
