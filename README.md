@@ -13,7 +13,6 @@ You can find the C++ implementation of the APF PID controller in `./apf`.
 - It is recommended to start with a fresh Ubuntu 22.04 installation.
 - Install GIT: sudo apt install git
 - Install gcc: sudo apt install gcc
-- Install cmake: sudo apt install cmake
 - Install Python 3.7:
 
 sudo add-apt-repository ppa:deadsnakes/ppa
@@ -29,6 +28,16 @@ source apf-hgg/bin/activate
 sudo apt-get install python3-dev
 sudo apt-get install python3.7-dev
 pip install transformations
+
+- Install cmake-3.30:
+wget https://github.com/Kitware/CMake/releases/download/v3.30.0/cmake-3.30.0-linux-x86_64.tar.gz
+tar -zxvf cmake-3.30.0-linux-x86_64.tar.gz
+sudo mv cmake-3.30.0-linux-x86_64 /opt/cmake
+sudo ln -s /opt/cmake/bin/* /usr/local/bin/
+
+- Install g++:
+sudo apt-get install g++
+export CXX=/usr/bin/g++
 
 ## Usage
 
