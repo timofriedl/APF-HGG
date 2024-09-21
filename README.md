@@ -45,6 +45,24 @@ export CXX=/usr/bin/g++
 
 - Install Mujoco (see Patrick Hinner's repository)
 
+- sudo apt-get install libx11-dev
+- sudo apt-get install libglew-dev
+- sudo apt-get install patchelf
+- sudo apt-get install ffmpeg
+
+- ~/.bashrc:
+# Mujoco
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:~/.mujoco/mujoco210/bin
+
+# Nvidia
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/lib/nvidia
+
+# ForecsPro
+export PYTHONPATH=$PYTHONPATH:~/forces_pro_client
+
+- source ~/.bashrc
+- Activate your virtual environment
+
 ## Usage
 
 Play video using
