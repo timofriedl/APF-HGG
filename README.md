@@ -46,7 +46,7 @@ python3.7 -m venv apf-hgg
 source apf-hgg/bin/activate
 ```
 
-- If you encounter "Encountered error while trying to install package.", install "transformations":
+- Install transformations:
 ```
 sudo apt-get install python3-dev
 sudo apt-get install python3.7-dev
@@ -73,7 +73,7 @@ export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:~/.mujoco/mujoco210/bin
 # Nvidia
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/lib/nvidia
 
-# ForecsPro
+# ForcesPro
 export PYTHONPATH=$PYTHONPATH:~/forces_pro_client
 ```
 
