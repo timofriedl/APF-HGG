@@ -1,5 +1,9 @@
 # Dynamic Obstacle Avoidance Using Artificial Potential Field in Reinforcement Learning
 
+<p align="center">
+  <img src="docs/apf-hgg.gif" alt="APF-HGG dynamic obstacle avoidance demo" width="640">
+</p>
+
 ## Description
 
 APF-HGG is based on the repository of [MPPI-HGG](https://github.com/phinners/HGG-MPPI) by Patrick Hinners.
