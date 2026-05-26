@@ -1,7 +1,8 @@
 # Dynamic Obstacle Avoidance Using Artificial Potential Field in Reinforcement Learning
 
 <p align="center">
-  <img src="docs/apf-hgg.gif" alt="APF-HGG dynamic obstacle avoidance demo" width="640">
+  <img src="docs/apf-hgg.gif" alt="APF-HGG 3D dynamic obstacle avoidance demo" width="48%">
+  <img src="docs/apf-hgg-2d.gif" alt="APF-HGG 2D dynamic obstacle avoidance demo" width="48%">
 </p>
 
 ## Description
